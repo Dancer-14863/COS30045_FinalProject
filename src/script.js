@@ -23,23 +23,22 @@ const initLineChart = async () => {
 
     let labels = new Array();
     let chartData = new Array();
-    let currentYearTotal = 0;
-    let currentYearNum = 0;
 
-    labels.push(parseInt(dataset[0].Time, 10));
+    let yearValues = new Array();
     for (const data of dataset)
     {
-        currentYearTotal += parseFloat(data.Amount, 10);
-        currentYearNum++;
-
         const year = parseInt(data.Time, 10);
         if (!labels.includes(year)) {
             labels.push(year);
-            const averageTemp = currentYearTotal / currentYearNum;
-            chartData.push(averageTemp.toFixed(2));
-            currentYearTotal = 0;
-            currentYearNum = 0;
+            yearValues.push({ values: new Array() });
         }
+        yearValues[yearValues.length - 1].values.push(parseFloat(data.Amount, 10));
+    }
+
+    for (const record of yearValues)
+    {
+        const yearAverage = record.values.reduce((a, b) => a + b, 0) / record.values.length;
+        chartData.push(yearAverage.toFixed(2));
     }
 
     const config = {
@@ -50,14 +49,14 @@ const initLineChart = async () => {
                 fill: false,
                 borderColor: "#663399",
                 data: chartData,
-                label: "Average GISTEMP"
+                label: "LOTI Global Mean"
             }]
         },
         options: {
             responsive: true,
             title: {
                 display: true,
-                text: "Test"
+                text: "GISTEMP LOTI Global Mean (1880 - 2019)"
             },
             tooltips: {
                 mode: "index",
@@ -73,13 +72,13 @@ const initLineChart = async () => {
                     scaleLabel: {
                         display: true,
                         labelString: "Year"
-                    }
+                    },
                 }],
                 yAxes: [{
                     display: true,
                     scaleLabel: {
                         display: true,
-                        labelString: "Average change in GISTEMP"
+                        labelString: "LOTI Global Mean"
                     }
                 }]
             }
@@ -89,8 +88,6 @@ const initLineChart = async () => {
     const ctx = document.getElementById("gistemp-chart").getContext("2d");
 
     const myLine = new Chart(ctx, config)
-
-
 }
 
 const main = () => {
