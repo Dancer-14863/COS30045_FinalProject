@@ -18,45 +18,103 @@ const readFromCSV = async fileName => {
     }
 }
 
+// taken from https://medium.com/@sahirnambiar/linear-least-squares-a-javascript-implementation-and-a-definitional-question-e3fba55a6d4b 
+const findLineByLeastSquares = (values_x, values_y) => {
+    let x_sum = 0;
+    let y_sum = 0;
+    let xy_sum = 0;
+    let xx_sum = 0;
+    let count = 0;
+
+    /*
+     * The above is just for quick access, makes the program faster
+     */
+    let x = 0;
+    let y = 0;
+    let values_length = values_x.length;
+
+    if (values_length !== values_y.length) {
+        throw new Error('The parameters values_x and values_y need to have same size!');
+    }
+
+    /*
+     * Above and below cover edge cases
+     */
+    if (values_length === 0) {
+        return [ [], [] ];
+    }
+
+    /*
+     * Calculate the sum for each of the parts necessary.
+     */
+    for (let i = 0; i < values_length; i++) {
+        x = values_x[i];
+        y = values_y[i];
+        x_sum += x;
+        y_sum += y;
+        xx_sum += x * x;
+        xy_sum += x * y;
+        count++;
+    }
+
+    /*
+     * Calculate m and b for the line equation:
+     * y = x * m + b
+     */
+    var m = (count * xy_sum - x_sum * y_sum) / (count * xx_sum - x_sum * x_sum);
+    var b = (y_sum / count) - (m * x_sum) / count;
+
+    /*
+     * We then return the x and y data points according to our fit
+     */
+    var result_values_x = [];
+    var result_values_y = [];
+
+    for (let i = 0; i < values_length; i++) {
+        x = values_x[i];
+        y = x * m + b;
+        result_values_x.push(x);
+        result_values_y.push(y);
+    }
+
+    return [result_values_x, result_values_y];
+}
+
 const initLineChart = async () => {
     const dataset = await readFromCSV("data/gistemp.csv");
 
     let labels = new Array();
     let chartData = new Array();
 
-    let yearValues = new Array();
     for (const data of dataset)
     {
-        const year = parseInt(data.Time, 10);
-        if (!labels.includes(year)) {
-            labels.push(year);
-            yearValues.push({ values: new Array() });
-        }
-        yearValues[yearValues.length - 1].values.push(parseFloat(data.Amount, 10));
+        labels.push(parseFloat(data.Time))
+        chartData.push(parseFloat(data.Amount))
     }
 
-    for (const record of yearValues)
-    {
-        const yearAverage = record.values.reduce((a, b) => a + b, 0) / record.values.length;
-        chartData.push(yearAverage.toFixed(2));
-    }
+    const trendLine = findLineByLeastSquares(labels, chartData);
 
     const config = {
         type: "line",
         data: {
             labels: labels,
             datasets: [{
-                fill: false,
                 borderColor: "#663399",
                 data: chartData,
-                label: "LOTI Global Mean"
+                label: "LOTI Global Mean",
+                showLine: false,
+            }, {
+                fill: false,
+                borderColor: "#de1a1a",
+                data: trendLine[1],
+                label: "Linear Trend (OLS)"
             }]
         },
         options: {
             responsive: true,
             title: {
                 display: true,
-                text: "GISTEMP LOTI Global Mean (1880 - 2019)"
+                text: "GISTEMP LOTI Global Mean (1960 - 2019)"
             },
             tooltips: {
                 mode: "index",
@@ -68,17 +126,28 @@ const initLineChart = async () => {
             },
             scales: {
                 xAxes: [{
+                    ticks: {
+                        maxTicksLimit: 10
+                    },
                     display: true,
                     scaleLabel: {
                         display: true,
                         labelString: "Year"
                     },
+                    gridLines: {
+                        drawOnChartArea: false,
+                        color: "#000"
+                    }
                 }],
                 yAxes: [{
                     display: true,
                     scaleLabel: {
                         display: true,
                         labelString: "LOTI Global Mean"
+                    },
+                    gridLines: {
+                        drawOnChartArea: false,
+                        color: "#000"
                     }
                 }]
             }
@@ -86,7 +155,6 @@ const initLineChart = async () => {
     };
 
     const ctx = document.getElementById("gistemp-chart").getContext("2d");
-
     const myLine = new Chart(ctx, config)
 }
 
