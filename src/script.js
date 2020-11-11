@@ -80,9 +80,7 @@ const findLineByLeastSquares = (values_x, values_y) => {
     return [result_values_x, result_values_y];
 }
 
-const initLineChart = async () => {
-    const dataset = await readFromCSV("data/gistemp.csv");
-
+const drawLineChart = (chart, dataset, config, drawTrendLine) => {
     let labels = new Array();
     let chartData = new Array();
 
@@ -92,21 +90,59 @@ const initLineChart = async () => {
         chartData.push(parseFloat(data.Amount))
     }
 
-    const trendLine = findLineByLeastSquares(labels, chartData);
+    config.data.labels = labels;
+    config.data.datasets[0].data = chartData;
+    if (drawTrendLine) {
+        const trendLine = findLineByLeastSquares(labels, chartData);
+        config.data.datasets[1].data = trendLine[1];
+    }
+    chart.config = config;
+    chart.options = config.options;
+    chart.update();
+}
 
-    const config = {
+const addSelectOptions = (elementID, optionArray) => {
+    const element = document.getElementById(elementID);
+    for (const option of optionArray)
+    {
+        const optionElement = document.createElement("option");
+        optionElement.appendChild( document.createTextNode(option) );
+        optionElement.value =  option; 
+        element.appendChild(optionElement); 
+    }
+
+};
+
+const getYearValues = (dataset) => {
+    let yearValues = new Array();
+    for (const data of dataset)
+    {
+        const year = parseInt(data.Time, 10);
+        if(!yearValues.includes(year))
+        {
+            yearValues.push(year);
+        }
+    }
+    return yearValues;
+}
+
+const initGistempChart = async () => {
+    const ctx = document.getElementById("gistemp-chart").getContext("2d");
+    const myLine = new Chart(ctx)
+    const gistempDataset = await readFromCSV("data/gistemp.csv");
+    const gistempConfig = {
         type: "line",
         data: {
-            labels: labels,
+            labels: null,
             datasets: [{
                 borderColor: "#663399",
-                data: chartData,
+                data: null,
                 label: "LOTI Global Mean",
                 showLine: false,
             }, {
                 fill: false,
                 borderColor: "#de1a1a",
-                data: trendLine[1],
+                data: null,
                 label: "Linear Trend (OLS)"
             }]
         },
@@ -153,13 +189,84 @@ const initLineChart = async () => {
             }
         }
     };
+    const gistempFilteredConfig = {
+        type: "line",
+        data: {
+            labels: null,
+            datasets: [{
+                borderColor: "#663399",
+                data: null,
+                label: "LOTI Global Mean",
+                showLine: true,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+            },
+            tooltips: {
+                mode: "index",
+                intersect: false,
+            },
+            hover: {
+                mode: "nearest",
+                intersect: true
+            },
+            scales: {
+                xAxes: [{
+                    ticks: {
+                        maxTicksLimit: 10
+                    },
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: "Year"
+                    },
+                    gridLines: {
+                        drawOnChartArea: false,
+                        color: "#000"
+                    }
+                }],
+                yAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: "LOTI Global Mean"
+                    },
+                    gridLines: {
+                        drawOnChartArea: false,
+                        color: "#000"
+                    }
+                }]
+            }
+        }
+    };
+    const gistempYearValues = getYearValues(gistempDataset);
+    addSelectOptions("gistemp-year", gistempYearValues);
+    drawLineChart(myLine, gistempDataset, gistempConfig, true);
 
-    const ctx = document.getElementById("gistemp-chart").getContext("2d");
-    const myLine = new Chart(ctx, config)
-}
+    let selectedYear = "";
+    document.getElementById("gistemp-year").addEventListener("change", function() {
+        selectedYear = this.value;
+        if (selectedYear !== "") {
+            const filteredDataset = gistempDataset.filter(data => data.Time >= selectedYear && data.Time <= selectedYear + 1);
+            gistempFilteredConfig.options.title.text = `GISTEMP LOTI Global Mean ${selectedYear}`;
+            drawLineChart(myLine, filteredDataset, gistempFilteredConfig, false);
+        } else {
+            drawLineChart(myLine, gistempDataset, gistempConfig, true);
+        }
+    });
+
+};
+
+const initCharts = () => {
+    initGistempChart();
+};
 
 const main = () => {
-    initLineChart();
+    initCharts();
 };
 
 window.addEventListener("load", main);
