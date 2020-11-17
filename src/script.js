@@ -126,10 +126,10 @@ const getYearValues = (dataset) => {
     return yearValues;
 }
 
-const initGistempChart = async () => {
-    const ctx = document.getElementById("gistemp-chart").getContext("2d");
+const initCo2Chart = async () => {
+    const ctx = document.getElementById("co2-chart").getContext("2d");
     const myLine = new Chart(ctx)
-    const gistempDataset = await readFromCSV("data/gistemp.csv");
+    const gistempDataset = await readFromCSV("data/esrl-co2.csv");
     const gistempConfig = {
         type: "line",
         data: {
@@ -244,11 +244,11 @@ const initGistempChart = async () => {
         }
     };
     const gistempYearValues = getYearValues(gistempDataset);
-    addSelectOptions("gistemp-year", gistempYearValues);
+    addSelectOptions("co2-year", gistempYearValues);
     drawLineChart(myLine, gistempDataset, gistempConfig, true);
 
     let selectedYear = "";
-    document.getElementById("gistemp-year").addEventListener("change", function() {
+    document.getElementById("co2-year").addEventListener("change", function() {
         selectedYear = this.value;
         if (selectedYear !== "") {
             const filteredDataset = gistempDataset.filter(data => data.Time >= selectedYear && data.Time <= selectedYear + 1);
@@ -261,8 +261,192 @@ const initGistempChart = async () => {
 
 };
 
-const initCharts = () => {
-    initGistempChart();
+const initCharts = async () => {
+    const lineChartConfig = [
+        {
+            chartElementName: "gistemp-chart",
+            yearFilterElementName: "gistemp-year",
+            datasetFile: "data/gistemp.csv",
+            mainChartConfig: {
+                type: "line",
+                data: {
+                    labels: null,
+                    datasets: [{
+                        borderColor: "#663399",
+                        data: null,
+                        label: "LOTI Monthly Mean",
+                        showLine: false,
+                    }, {
+                        fill: false,
+                        borderColor: "#de1a1a",
+                        data: null,
+                        label: "Linear Trend (OLS)"
+                    }]
+                },
+            },
+            filterChartConfig: {
+                type: "line",
+                data: {
+                    labels: null,
+                    datasets: [{
+                        borderColor: "#663399",
+                        data: null,
+                        label: "LOTI Monthly Mean",
+                        showLine: true,
+                        fill: false
+                    }]
+                },
+            },
+            axisConfig: {
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: "Land-Ocean Temperature Index Global Mean"
+                    },
+                    tooltips: {
+                        mode: "index",
+                        intersect: false,
+                    },
+                    hover: {
+                        mode: "nearest",
+                        intersect: true
+                    },
+                    scales: {
+                        xAxes: [{
+                            ticks: {
+                                maxTicksLimit: 10
+                            },
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: "Year"
+                            },
+                            gridLines: {
+                                drawOnChartArea: false,
+                                color: "#000"
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: "Celsius (°C)"
+                            },
+                            gridLines: {
+                                drawOnChartArea: false,
+                                color: "#000"
+                            }
+                        }]
+                    }
+                }
+            }
+        },
+        {
+            chartElementName: "co2-chart",
+            yearFilterElementName: "co2-year",
+            datasetFile: "data/esrl-co2.csv",
+            mainChartConfig: {
+                type: "line",
+                data: {
+                    labels: null,
+                    datasets: [{
+                        borderColor: "#663399",
+                        data: null,
+                        label: "CO2 Monthly Mean",
+                        showLine: false,
+                    }, {
+                        fill: false,
+                        borderColor: "#de1a1a",
+                        data: null,
+                        label: "Linear Trend (OLS)"
+                    }]
+                },
+            },
+            filterChartConfig: {
+                type: "line",
+                data: {
+                    labels: null,
+                    datasets: [{
+                        borderColor: "#663399",
+                        data: null,
+                        label: "CO2 Monthly Mean",
+                        showLine: true,
+                        fill: false
+                    }]
+                },
+            },
+            axisConfig: {
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: "Atmospheric CO2 at Mauna Loa Observatory"
+                    },
+                    tooltips: {
+                        mode: "index",
+                        intersect: false,
+                    },
+                    hover: {
+                        mode: "nearest",
+                        intersect: true
+                    },
+                    scales: {
+                        xAxes: [{
+                            ticks: {
+                                maxTicksLimit: 10
+                            },
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: "Year"
+                            },
+                            gridLines: {
+                                drawOnChartArea: false,
+                                color: "#000"
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: "parts per million (ppm)"
+                            },
+                            gridLines: {
+                                drawOnChartArea: false,
+                                color: "#000"
+                            }
+                        }]
+                    }
+                }
+            }
+        }
+    ];
+
+    for (const element of lineChartConfig) {
+        const ctx = document.getElementById(element.chartElementName).getContext("2d");
+        const chart = new Chart(ctx)
+        const dataset = await readFromCSV(element.datasetFile);
+        const datasetYearValues = getYearValues(dataset);
+
+        element.mainChartConfig.options = element.axisConfig.options;
+        element.filterChartConfig.options = element.axisConfig.options;
+        addSelectOptions(element.yearFilterElementName, datasetYearValues);
+        drawLineChart(chart, dataset, element.mainChartConfig, true);
+
+        let selectedYear = "";
+        document.getElementById(element.yearFilterElementName).addEventListener("change", function() {
+            selectedYear = this.value;
+            if (selectedYear !== "") {
+                const filteredDataset = dataset.filter(data => data.Time >= selectedYear && data.Time <= selectedYear + 1);
+                element.filterChartConfig.options.title.text = `${element.axisConfig.options.title.text} ${selectedYear}`;
+
+                drawLineChart(chart, filteredDataset, element.filterChartConfig, false);
+            } else {
+                drawLineChart(chart, dataset, element.mainChartConfig, true);
+            }
+        });
+    }
 };
 
 const main = () => {
