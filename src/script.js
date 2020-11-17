@@ -126,142 +126,146 @@ const getYearValues = (dataset) => {
     return yearValues;
 }
 
-const initCo2Chart = async () => {
-    const ctx = document.getElementById("co2-chart").getContext("2d");
-    const myLine = new Chart(ctx)
-    const gistempDataset = await readFromCSV("data/esrl-co2.csv");
-    const gistempConfig = {
-        type: "line",
-        data: {
-            labels: null,
-            datasets: [{
-                borderColor: "#663399",
-                data: null,
-                label: "LOTI Global Mean",
-                showLine: false,
-            }, {
-                fill: false,
-                borderColor: "#de1a1a",
-                data: null,
-                label: "Linear Trend (OLS)"
-            }]
-        },
-        options: {
-            responsive: true,
-            title: {
-                display: true,
-                text: "GISTEMP LOTI Global Mean (1960 - 2019)"
-            },
-            tooltips: {
-                mode: "index",
-                intersect: false,
-            },
-            hover: {
-                mode: "nearest",
-                intersect: true
-            },
-            scales: {
-                xAxes: [{
-                    ticks: {
-                        maxTicksLimit: 10
-                    },
-                    display: true,
-                    scaleLabel: {
-                        display: true,
-                        labelString: "Year"
-                    },
-                    gridLines: {
-                        drawOnChartArea: false,
-                        color: "#000"
-                    }
-                }],
-                yAxes: [{
-                    display: true,
-                    scaleLabel: {
-                        display: true,
-                        labelString: "LOTI Global Mean"
-                    },
-                    gridLines: {
-                        drawOnChartArea: false,
-                        color: "#000"
-                    }
-                }]
-            }
-        }
-    };
-    const gistempFilteredConfig = {
-        type: "line",
-        data: {
-            labels: null,
-            datasets: [{
-                borderColor: "#663399",
-                data: null,
-                label: "LOTI Global Mean",
-                showLine: true,
-                fill: false
-            }]
-        },
-        options: {
-            responsive: true,
-            title: {
-                display: true,
-            },
-            tooltips: {
-                mode: "index",
-                intersect: false,
-            },
-            hover: {
-                mode: "nearest",
-                intersect: true
-            },
-            scales: {
-                xAxes: [{
-                    ticks: {
-                        maxTicksLimit: 10
-                    },
-                    display: true,
-                    scaleLabel: {
-                        display: true,
-                        labelString: "Year"
-                    },
-                    gridLines: {
-                        drawOnChartArea: false,
-                        color: "#000"
-                    }
-                }],
-                yAxes: [{
-                    display: true,
-                    scaleLabel: {
-                        display: true,
-                        labelString: "LOTI Global Mean"
-                    },
-                    gridLines: {
-                        drawOnChartArea: false,
-                        color: "#000"
-                    }
-                }]
-            }
-        }
-    };
-    const gistempYearValues = getYearValues(gistempDataset);
-    addSelectOptions("co2-year", gistempYearValues);
-    drawLineChart(myLine, gistempDataset, gistempConfig, true);
 
+const drawCO2StackedBarChart = (datasets, minYear, maxYear) => {
+    const ctx = document.getElementById("co2-fuel-chart").getContext("2d");
+    const chart = new Chart(ctx);
+    let co2GasFuelArr = [];
+    let co2GLiquidFuelArr = [];
+    let co2SolidFuelArr = [];
+    let chartDatasets = [
+        {
+            label: "CO2 Emissions from Gaseous Fuel Consumption",
+            data: [],
+            backgroundColor: '#D6E9C6'
+        },
+        {
+            label: "CO2 Emissions from Liquid Fuel Consumption",
+            data: [],
+            backgroundColor: '#FAEBCC'
+        },
+        {
+            label: "CO2 Emissions from Solid Fuel Consumption",
+            data: [],
+            backgroundColor: '#EBCCD1'
+        }
+    ];
+    const labels = [];
+    for (let i = minYear; i <= maxYear; i++) {
+        let co2GasFuel = 0;
+        let co2GLiquidFuel = 0;
+        let co2SolidFuel = 0;
+
+        labels.push(i);
+
+        for (const element of datasets[0]) {
+            if (element[i] !== "Not Recorded") {
+                co2GasFuel += parseFloat(element[i], 10);
+            }
+        }
+
+        for (const element of datasets[1]) {
+            if (element[i] !== "Not Recorded") {
+                co2GLiquidFuel += parseFloat(element[i], 10);
+            }
+        }
+
+        for (const element of datasets[2]) {
+            if (element[i] !== "Not Recorded") {
+                co2SolidFuel += parseFloat(element[i], 10);
+            }
+        }
+
+        co2GasFuelArr.push(co2GasFuel);
+        co2GLiquidFuelArr.push(co2GLiquidFuel);
+        co2SolidFuelArr.push(co2SolidFuel);
+    }
+
+    chartDatasets[0].data = co2GasFuelArr;
+    chartDatasets[1].data = co2GLiquidFuelArr;
+    chartDatasets[2].data = co2SolidFuelArr;
+
+    const chartConfig = {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: chartDatasets
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: "CO2 Emissions from Fuel Consumption"
+            },
+            tooltips: {
+                mode: "index",
+                intersect: false,
+            },
+            hover: {
+                mode: "nearest",
+                intersect: true
+            },
+            scales: {
+                xAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: "Year"
+                    },
+                    gridLines: {
+                        drawOnChartArea: false,
+                        color: "#000"
+                    },
+                    stacked: true
+                }],
+                yAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: "metric kiloton (kt)"
+                    },
+                    gridLines: {
+                        drawOnChartArea: false,
+                        color: "#000"
+                    },
+                    stacked: true
+                }]
+            }
+        }
+    };
+
+    chart.config = chartConfig;
+    chart.options = chartConfig.options;
+    chart.update();
+
+    addSelectOptions("co2-fuel-year", labels);
     let selectedYear = "";
-    document.getElementById("co2-year").addEventListener("change", function() {
+    document.getElementById("co2-fuel-year").addEventListener("change", function() {
         selectedYear = this.value;
         if (selectedYear !== "") {
-            const filteredDataset = gistempDataset.filter(data => data.Time >= selectedYear && data.Time <= selectedYear + 1);
-            gistempFilteredConfig.options.title.text = `GISTEMP LOTI Global Mean ${selectedYear}`;
-            drawLineChart(myLine, filteredDataset, gistempFilteredConfig, false);
+            const datasetIndex = labels.indexOf(parseInt(selectedYear, 10));
+            chartConfig.data.labels = [labels[datasetIndex]];
+            chartDatasets[0].data = [co2GasFuelArr[datasetIndex]];
+            chartDatasets[1].data = [co2GLiquidFuelArr[datasetIndex]];
+            chartDatasets[2].data = [co2SolidFuelArr[datasetIndex]];
         } else {
-            drawLineChart(myLine, gistempDataset, gistempConfig, true);
+            chartConfig.data.labels = labels;
+            chartDatasets[0].data = co2GasFuelArr;
+            chartDatasets[1].data = co2GLiquidFuelArr;
+            chartDatasets[2].data = co2SolidFuelArr;
         }
+        chart.update();
     });
-
 };
 
+
 const initCharts = async () => {
+    const co2GasFuelDataset = await readFromCSV("data/API_EN.ATM.CO2E.GF.KT_DS2_en_csv_v2_1347792.csv");
+    const co2GLiquidFuelDataset = await readFromCSV("data/API_EN.ATM.CO2E.LF.KT_DS2_en_csv_v2_1350621.csv");
+    const co2SolidFuelDataset = await readFromCSV("data/API_EN.ATM.CO2E.SF.KT_DS2_en_csv_v2_1350043.csv");
+
+    drawCO2StackedBarChart([co2GasFuelDataset, co2GLiquidFuelDataset, co2SolidFuelDataset], 1960, 2019);
+
     const lineChartConfig = [
         {
             chartElementName: "gistemp-chart",
