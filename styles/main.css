@@ -1,11 +1,106 @@
-.chart-container
-{
+/* *********************** */
+/*
+    CSS Reset
+    taken from https://www.digitalocean.com/community/tutorials/css-minimal-css-reset
+*/
+html {
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+body, h1, h2, h3, h4, h5, h6, p, ol, ul {
+    margin: 0;
+    padding: 0;
+    font-weight: normal;
+}
+
+ol, ul {
+    list-style: none;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+/* *********************** */
+
+/* css variables */
+:root {
+    --primary: #2d132c;
+    --secondary: #801336;
+    --font-primary: #c72c41;
+    --font-secondary: #ee4540;
+}
+
+body {
+    background-color: var(--primary);
+    color: var(--font-primary);
+    font-family: 'Open Sans', sans-serif;
+    display: grid;
+    grid-template-columns: 15% auto;
+    grid-template-rows: auto;
+    grid-template-areas: 
+        "nav main";
+    height: 100vh;
+    overflow: hidden;
+}
+
+/*
+    Taken from https://www.smashingmagazine.com/2016/05/fluid-typography/
+*/
+@media screen and (min-width: 25em){
+  html { font-size: calc( 12px + (24 - 16) * (100vw - 400px) / (1920 - 400) ); }
+}
+
+nav {
+    grid-area: nav;
+    background-color: var(--secondary);
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+
+nav ul li {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+nav ul li a {
+    width: 100%;
+    padding: 0.5rem;
+    background-color: var(--primary);
+    color: var(--secondary);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav ul li a:hover {
+    border: none;
+    color: var(--font-secondary);
+}
+
+#main {
+    grid-area: main;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    overflow-y: scroll;
+}
+
+#main section {
+    margin: 1rem;
+}
+
+
+.chart-container {
     position: relative;
     height: 60vh;
     width: 60vw;
-}
-
-section
-{
-    margin: 5rem 0;
 }

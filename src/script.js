@@ -137,17 +137,17 @@ const drawCO2StackedBarChart = (datasets, minYear, maxYear) => {
         {
             label: "CO2 Emissions from Gaseous Fuel Consumption",
             data: [],
-            backgroundColor: '#D6E9C6'
+            backgroundColor: '#801336'
         },
         {
             label: "CO2 Emissions from Liquid Fuel Consumption",
             data: [],
-            backgroundColor: '#FAEBCC'
+            backgroundColor: '#ee4540'
         },
         {
             label: "CO2 Emissions from Solid Fuel Consumption",
             data: [],
-            backgroundColor: '#EBCCD1'
+            backgroundColor: '#c72c41'
         }
     ];
     const labels = [];
