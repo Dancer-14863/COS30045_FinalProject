@@ -18,6 +18,17 @@ const readFromCSV = async fileName => {
     }
 }
 
+const readFromJSON = async fileName => {
+    let dataset = null;
+    try {
+        dataset = await d3.json(fileName);
+        return dataset;
+    } catch (error) {
+        alert(error);
+    }
+}
+
+
 // taken from https://medium.com/@sahirnambiar/linear-least-squares-a-javascript-implementation-and-a-definitional-question-e3fba55a6d4b 
 const findLineByLeastSquares = (values_x, values_y) => {
     let x_sum = 0;
@@ -137,17 +148,17 @@ const drawCO2StackedBarChart = (datasets, minYear, maxYear) => {
         {
             label: "CO2 Emissions from Gaseous Fuel Consumption",
             data: [],
-            backgroundColor: '#801336'
+            backgroundColor: 'red'
         },
         {
             label: "CO2 Emissions from Liquid Fuel Consumption",
             data: [],
-            backgroundColor: '#ee4540'
+            backgroundColor: 'green'
         },
         {
             label: "CO2 Emissions from Solid Fuel Consumption",
             data: [],
-            backgroundColor: '#c72c41'
+            backgroundColor: 'blue'
         }
     ];
     const labels = [];
@@ -216,7 +227,7 @@ const drawCO2StackedBarChart = (datasets, minYear, maxYear) => {
                         drawOnChartArea: false,
                         color: "#000"
                     },
-                    stacked: true
+                    stacked: true,
                 }],
                 yAxes: [{
                     display: true,
@@ -228,7 +239,7 @@ const drawCO2StackedBarChart = (datasets, minYear, maxYear) => {
                         drawOnChartArea: false,
                         color: "#000"
                     },
-                    stacked: true
+                    stacked: true,
                 }]
             }
         }
@@ -258,14 +269,41 @@ const drawCO2StackedBarChart = (datasets, minYear, maxYear) => {
     });
 };
 
+const drawCO2GeoMap = (datasets, geoJSON) => {
+    const width = 300;
+    const height = 300;
+
+    const projection = d3.geoMercator()
+                            .center([0, 0])
+                            .translate([width / 2, height / 2])
+                            .scale(70);
+
+    const path = d3.geoPath()
+                    .projection(projection);
+
+    const svg = d3.select("#co2-global-chart")
+                    .append("svg")
+                     .attr("viewBox", `0 0 ${width} ${height}`)
+                    .attr("fill", "grey");
+
+    d3.json("data/custom.geo.json")
+        .then(json => {
+            svg.selectAll("path")
+                .data(json.features)
+                .enter()
+                .append("path")
+                .attr("d", path);
+        })
+        .catch(error => {
+            alert("There was a problem with loading the json file. Check the console for more details");
+            console.error(error);
+        });
+    
+    
+};
+
 
 const initCharts = async () => {
-    const co2GasFuelDataset = await readFromCSV("data/API_EN.ATM.CO2E.GF.KT_DS2_en_csv_v2_1347792.csv");
-    const co2GLiquidFuelDataset = await readFromCSV("data/API_EN.ATM.CO2E.LF.KT_DS2_en_csv_v2_1350621.csv");
-    const co2SolidFuelDataset = await readFromCSV("data/API_EN.ATM.CO2E.SF.KT_DS2_en_csv_v2_1350043.csv");
-
-    drawCO2StackedBarChart([co2GasFuelDataset, co2GLiquidFuelDataset, co2SolidFuelDataset], 1960, 2019);
-
     const lineChartConfig = [
         {
             chartElementName: "gistemp-chart",
@@ -609,9 +647,20 @@ const initCharts = async () => {
             }
         });
     }
+
+    const co2GasFuelDataset = await readFromCSV("data/API_EN.ATM.CO2E.GF.KT_DS2_en_csv_v2_1347792.csv");
+    const co2GLiquidFuelDataset = await readFromCSV("data/API_EN.ATM.CO2E.LF.KT_DS2_en_csv_v2_1350621.csv");
+    const co2SolidFuelDataset = await readFromCSV("data/API_EN.ATM.CO2E.SF.KT_DS2_en_csv_v2_1350043.csv");
+
+    drawCO2StackedBarChart([co2GasFuelDataset, co2GLiquidFuelDataset, co2SolidFuelDataset], 1960, 2019);
+
+    const globeJSON = await readFromJSON("data/LGA_VIC.json");
+
+    drawCO2GeoMap([co2GasFuelDataset, co2GLiquidFuelDataset, co2SolidFuelDataset], globeJSON);
+
 };
 
-const main = () => {
+const main = async () => {
     initCharts();
 };
 

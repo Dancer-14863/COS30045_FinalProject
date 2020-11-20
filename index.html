@@ -19,6 +19,7 @@
         <ul>
             <li><a href="#co2">Global CO2 Level</a></li>
             <li><a href="#co2-fuel">CO2 from Fuel Consumption</a></li>
+            <li><a href="#co2-global">CO2 Emissions from Countries</a></li>
             <li><a href="#gistemp">Global Temperature</a></li>
             <li><a href="#icelevel-n">Artic Sea Ice Level</a></li>
             <li><a href="#icelevel-s">Antartic Sea Ice Level</a></li>
@@ -43,6 +44,16 @@
             </select>
             <div class="chart-container">
                 <canvas id="co2-fuel-chart"></canvas>
+            </div>
+        </section>
+
+        <section id="co2-global" class="chart-card">
+            <label for="co2-global-year">Year</label>
+            <select name="co2-global-year" id="co2-global-year">
+                <option value=""">All</option>
+            </select>
+            <div class="chart-container">
+                <div id="co2-global-chart"></div>
             </div>
         </section>
 
