@@ -276,10 +276,10 @@ const initCharts = async () => {
                 data: {
                     labels: null,
                     datasets: [{
+                        showLine: false,
                         borderColor: "#663399",
                         data: null,
                         label: "LOTI Monthly Mean",
-                        showLine: false,
                     }, {
                         fill: false,
                         borderColor: "#de1a1a",
@@ -306,7 +306,7 @@ const initCharts = async () => {
                     responsive: true,
                     title: {
                         display: true,
-                        text: "Land-Ocean Temperature Index Global Mean"
+                        text: "GISS Land-Ocean Temperature Index"
                     },
                     tooltips: {
                         mode: "index",
@@ -424,6 +424,164 @@ const initCharts = async () => {
                     }
                 }
             }
+        },
+        {
+            chartElementName: "icelevel-n-chart",
+            yearFilterElementName: "icelevel-n-year",
+            datasetFile: "data/nsidc-seaice-n.csv",
+            mainChartConfig: {
+                type: "line",
+                data: {
+                    labels: null,
+                    datasets: [{
+                        borderColor: "#663399",
+                        data: null,
+                        label: "Monthly Sea Ice Index",
+                        showLine: false,
+                    }, {
+                        fill: false,
+                        borderColor: "#de1a1a",
+                        data: null,
+                        label: "Linear Trend (OLS)"
+                    }]
+                },
+            },
+            filterChartConfig: {
+                type: "line",
+                data: {
+                    labels: null,
+                    datasets: [{
+                        borderColor: "#663399",
+                        data: null,
+                        label: "Monthly Sea Ice Index",
+                        showLine: true,
+                        fill: false
+                    }]
+                },
+            },
+            axisConfig: {
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: "NSIDC Artic Sea Ice Index"
+                    },
+                    tooltips: {
+                        mode: "index",
+                        intersect: false,
+                    },
+                    hover: {
+                        mode: "nearest",
+                        intersect: true
+                    },
+                    scales: {
+                        xAxes: [{
+                            ticks: {
+                                maxTicksLimit: 10
+                            },
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: "Year"
+                            },
+                            gridLines: {
+                                drawOnChartArea: false,
+                                color: "#000"
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: "%"
+                            },
+                            gridLines: {
+                                drawOnChartArea: false,
+                                color: "#000"
+                            }
+                        }]
+                    }
+                }
+            }
+        },
+        {
+            chartElementName: "icelevel-s-chart",
+            yearFilterElementName: "icelevel-s-year",
+            datasetFile: "data/nsidc-seaice-s.csv",
+            mainChartConfig: {
+                type: "line",
+                data: {
+                    labels: null,
+                    datasets: [{
+                        borderColor: "#663399",
+                        data: null,
+                        label: "Monthly Sea Ice Index",
+                        showLine: false,
+                    }, {
+                        fill: false,
+                        borderColor: "#de1a1a",
+                        data: null,
+                        label: "Linear Trend (OLS)"
+                    }]
+                },
+            },
+            filterChartConfig: {
+                type: "line",
+                data: {
+                    labels: null,
+                    datasets: [{
+                        borderColor: "#663399",
+                        data: null,
+                        label: "Monthly Sea Ice Index",
+                        showLine: true,
+                        fill: false
+                    }]
+                },
+            },
+            axisConfig: {
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: "NSIDC Antartic Sea Ice Index"
+                    },
+                    tooltips: {
+                        mode: "index",
+                        intersect: false,
+                    },
+                    hover: {
+                        mode: "nearest",
+                        intersect: true
+                    },
+                    scales: {
+                        xAxes: [{
+                            ticks: {
+                                maxTicksLimit: 10
+                            },
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: "Year"
+                            },
+                            gridLines: {
+                                drawOnChartArea: false,
+                                color: "#000"
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: "%"
+                            },
+                            gridLines: {
+                                drawOnChartArea: false,
+                                color: "#000"
+                            }
+                        }]
+                    }
+                }
+            }
         }
     ];
 
@@ -443,7 +601,7 @@ const initCharts = async () => {
             selectedYear = this.value;
             if (selectedYear !== "") {
                 const filteredDataset = dataset.filter(data => data.Time >= selectedYear && data.Time <= selectedYear + 1);
-                element.filterChartConfig.options.title.text = `${element.axisConfig.options.title.text} ${selectedYear}`;
+                element.filterChartConfig.options.title.text = `${element.mainChartConfig.options.title.text} ${selectedYear}`;
 
                 drawLineChart(chart, filteredDataset, element.filterChartConfig, false);
             } else {

@@ -20,11 +20,13 @@
             <li><a href="#co2">Global CO2 Level</a></li>
             <li><a href="#co2-fuel">CO2 from Fuel Consumption</a></li>
             <li><a href="#gistemp">Global Temperature</a></li>
+            <li><a href="#icelevel-n">Artic Sea Ice Level</a></li>
+            <li><a href="#icelevel-s">Antartic Sea Ice Level</a></li>
         </ul>
     </nav>
 
     <section id="main">
-        <section id="co2">
+        <section id="co2" class="chart-card">
             <label for="co2-year">Year</label>
             <select name="co2-year" id="co2-year">
                 <option value=""">All</option>
@@ -34,7 +36,7 @@
             </div>
         </section>
 
-        <section id="co2-fuel">
+        <section id="co2-fuel" class="chart-card">
             <label for="co2-fuel-year">Year</label>
             <select name="co2-fuel-year" id="co2-fuel-year">
                 <option value=""">All</option>
@@ -44,7 +46,7 @@
             </div>
         </section>
 
-        <section id="gistemp">
+        <section id="gistemp" class="chart-card">
             <label for="gistemp-year">Year</label>
             <select name="gistemp-year" id="gistemp-year">
                 <option value=""">All</option>
@@ -53,7 +55,29 @@
                 <canvas id="gistemp-chart"></canvas>
             </div>
         </section>
+
+        <section id="icelevel-n" class="chart-card">
+            <label for="icelevel-n-year">Year</label>
+            <select name="icelevel-n-year" id="icelevel-n-year">
+                <option value=""">All</option>
+            </select>
+            <div class="chart-container">
+                <canvas id="icelevel-n-chart"></canvas>
+            </div>
+        </section>
+
+        <section id="icelevel-s" class="chart-card">
+            <label for="icelevel-s-year">Year</label>
+            <select name="icelevel-s-year" id="icelevel-s-year">
+                <option value=""">All</option>
+            </select>
+            <div class="chart-container">
+                <canvas id="icelevel-s-chart"></canvas>
+            </div>
+        </section>
+
     </section>
+
 
 </body>
 </html>
