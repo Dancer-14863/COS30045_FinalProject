@@ -1,0 +1,323 @@
+>Countries to check against
+Chad
+Fiji
+Cook Islands
+Ashmore and Cartier Islands
+American Samoa
+Kiribati
+Guam
+Micronesia, Federated States of
+Marshall Islands
+Australia
+Northern Mariana Islands
+Pitcairn Islands
+Nauru
+Norfolk Island
+Niue
+New Caledonia
+Palau
+New Zealand
+French Polynesia
+Albania
+Samoa
+Vanuatu
+Tonga
+Wallis and Futuna
+Papua New Guinea
+Solomon Islands
+Aland
+Andorra
+Austria
+Belgium
+Bulgaria
+Czech Republic
+Switzerland
+Belarus
+Bosnia and Herzegovina
+Germany
+Denmark
+Estonia
+Spain
+Finland
+France
+Faeroe Islands
+United Kingdom
+Guernsey
+Hungary
+Croatia
+Isle of Man
+Greece
+Iceland
+Kosovo
+Jersey
+Liechtenstein
+Ireland
+Italy
+Latvia
+Luxembourg
+Lithuania
+Monaco
+Malta
+Montenegro
+Moldova
+Netherlands
+Macedonia, FYR
+Poland
+Romania
+San Marino
+Portugal
+Slovak Republic
+Norway
+Serbia
+Slovenia
+Sweden
+Ukraine
+Vatican (Holy Sea)
+Russian Federation
+Argentina
+Ecuador
+Colombia
+Bolivia
+Falkland Islands
+Brazil
+Guyana
+Chile
+Peru
+Paraguay
+Suriname
+Venezuela, RB
+Uruguay
+Azerbaijan
+Bahrain
+Armenia
+United Arab Emirates
+Afghanistan
+Bangladesh
+Brunei
+Bhutan
+Cyprus, Northern
+Cyprus
+Hong Kong SAR, China
+Georgia
+China
+Indian Ocean Territories
+Iraq
+Iran, Islamic Rep.
+India
+Israel
+Jordan
+Japan
+Indonesia
+Kashmir
+Cambodia
+Kyrgyz Republic
+Kuwait
+Korea, Rep.
+Lebanon
+Lao PDR
+Kazakhstan
+Sri Lanka
+Macao SAR, China
+Mongolia
+Nepal
+Myanmar
+Oman
+Pakistan
+Korea, Dem. Rep.
+Malaysia
+Palestine (West Bank and Gaza)
+Qatar
+Saudi Arabia
+Philippines
+Singapore
+Tajikistan
+Syrian Arab Republic
+Turkmenistan
+Taiwan
+Timor-Leste
+Turkey
+Thailand
+Vietnam
+Yemen, Rep.
+Uzbekistan
+Angola
+Burundi
+Botswana
+Burkina Faso
+Central African Republic
+Benin
+Côte d'Ivoire
+Congo, Dem. Rep.
+Congo, Rep.
+Cameroon
+Comoros
+Djibouti
+Algeria
+Cape Verde
+Eritrea
+Egypt, Arab Rep.
+Ethiopia
+Ghana
+Gabon
+Gambia, The
+Guinea-Bissau
+Kenya
+Equatorial Guinea
+Libya
+Liberia
+Guinea
+Madagascar
+Lesotho
+Morocco
+Mauritania
+Malawi
+Nigeria
+Namibia
+Mali
+Niger
+Mozambique
+Rwanda
+Western Sahara
+Senegal
+Sudan
+South Sudan
+Somalia
+Somaliland
+Swaziland
+Sierra Leone
+Togo
+São Tomé and Principe
+Tunisia
+Tanzania
+South Africa
+Uganda
+Zimbabwe
+Anguilla
+Aruba
+Zambia
+Bahamas, The
+Antigua and Barbuda
+St-Barthélemy
+Belize
+Bermuda
+Cayman Islands
+Curaçao
+Dominica
+Barbados
+Cuba
+Costa Rica
+Dominican Republic
+Grenada
+Guatemala
+Honduras
+Haiti
+Jamaica
+St. Kitts and Nevis
+St. Martin (French part)
+Greenland
+St. Lucia
+Montserrat
+Mexico
+Panama
+Puerto Rico
+Canada
+Nicaragua
+St. Pierre and Miquelon
+El Salvador
+St. Maarten (Dutch part)
+Turks and Caicos Islands
+Trinidad and Tobago
+St. Vincent and the Grenadines
+Virgin Islands (U.S.)
+British Virgin Islands
+United States of America
+Antarctica
+
+>Formuala used
+=IFERROR(IF(MATCH(A2,Sheet1!$A$1:$A$231,0),"Yes"),"No")
+
+>Countries Removed
+Arab World
+Central Europe and the Baltics
+Cabo Verde
+Channel Islands
+Caribbean small states
+East Asia & Pacific
+Early-demographic dividend
+East Asia & Pacific
+Europe & Central Asia (excluding high income)
+Europe & Central Asia
+Euro area
+European Union
+Fragile and conflict affected situations
+Gibraltar
+High income
+Heavily indebted poor countries (HIPC)
+IBRD only
+IDA & IBRD total
+IDA total
+IDA blend
+IDA only
+Not classified
+Latin America & Caribbean (excluding high income)
+Latin America & Caribbean
+Least developed countries: UN classification
+Low income
+Lower middle income
+Low & middle income
+Late-demographic dividend
+Gibraltar
+High income
+Heavily indebted poor countries (HIPC)
+IBRD only
+IDA & IBRD total
+IDA total
+IDA blend
+IDA only
+Not classified
+Latin America & Caribbean (excluding high income)
+Latin America & Caribbean
+Least developed countries: UN classification
+Low income
+Lower middle income
+Low & middle income
+Late-demographic dividend
+Maldives
+Middle East & North Africa
+Middle income
+North Macedonia
+Middle East & North Africa (excluding high income)
+Mauritius
+North America
+OECD members
+Other small states
+Pre-demographic dividend
+West Bank and Gaza
+Pacific island small states
+Post-demographic dividend
+South Asia
+Sub-Saharan Africa (excluding high income)
+Sub-Saharan Africa
+Small states
+Eswatini
+Seychelles
+East Asia & Pacific (IDA & IBRD countries)
+Europe & Central Asia (IDA & IBRD countries)
+Latin America & the Caribbean (IDA & IBRD countries)
+Middle East & North Africa (IDA & IBRD countries)
+South Asia (IDA & IBRD)
+Sub-Saharan Africa (IDA & IBRD countries)
+Tuvalu
+Upper middle income
+World ** EXCLUDED
+
+>Countries Renamed
+Brunei Darussalam -> Brunei
+Cote d'Ivoire -> Côte d'Ivoire
+Curacao -> Curaçao
+Faroe Islands -> Faeroe Islands
+Micronesia, Fed. Sts. -> Micronesia, Federated States of
+Sao Tome and Principe -> São Tomé and Principe
+Sint Maarten (Dutch part) -> St. Maarten (Dutch part)
+United States -> United States of America
+Korea, Dem. People’s Rep. -> Korea, Dem. Rep.

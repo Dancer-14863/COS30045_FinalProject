@@ -147,20 +147,23 @@ const drawCO2StackedBarChart = (datasets, minYear, maxYear) => {
     let chartDatasets = [
         {
             label: "CO2 Emissions from Gaseous Fuel Consumption",
-            data: [],
+            data: new Array(maxYear - minYear + 1),
             backgroundColor: 'red'
         },
         {
             label: "CO2 Emissions from Liquid Fuel Consumption",
-            data: [],
+            data: new Array(maxYear - minYear + 1),
             backgroundColor: 'green'
         },
         {
             label: "CO2 Emissions from Solid Fuel Consumption",
-            data: [],
+            data: new Array(maxYear - minYear + 1),
             backgroundColor: 'blue'
         }
     ];
+    chartDatasets[0].data.fill(0);
+    chartDatasets[1].data.fill(0);
+    chartDatasets[2].data.fill(0);
     const labels = [];
     for (let i = minYear; i <= maxYear; i++) {
         let co2GasFuel = 0;
@@ -170,20 +173,20 @@ const drawCO2StackedBarChart = (datasets, minYear, maxYear) => {
         labels.push(i);
 
         for (const element of datasets[0]) {
-            if (element[i] !== "Not Recorded") {
-                co2GasFuel += parseFloat(element[i], 10);
+            if (element[i] !== "Not Recorded" && element["Country Name"] === "World") {
+                co2GasFuel = parseFloat(element[i], 10);
             }
         }
 
         for (const element of datasets[1]) {
-            if (element[i] !== "Not Recorded") {
-                co2GLiquidFuel += parseFloat(element[i], 10);
+            if (element[i] !== "Not Recorded" && element["Country Name"] === "World") {
+                co2GLiquidFuel = parseFloat(element[i], 10);
             }
         }
 
         for (const element of datasets[2]) {
-            if (element[i] !== "Not Recorded") {
-                co2SolidFuel += parseFloat(element[i], 10);
+            if (element[i] !== "Not Recorded" && element["Country Name"] === "World") {
+                co2SolidFuel = parseFloat(element[i], 10);
             }
         }
 
@@ -269,35 +272,199 @@ const drawCO2StackedBarChart = (datasets, minYear, maxYear) => {
     });
 };
 
-const drawCO2GeoMap = (datasets, geoJSON) => {
+const drawCO2GeoMap = (datasets, geoJSON, minYear, maxYear) => {
+    let yearLabels = [];
+    let countryInfoSet = [];
+
+    // this is done because all three datasets have the same country list
+    for(const element of datasets[0]) {
+        if (!countryInfoSet.some(e => e.countryName === element["Country Name"])) {
+            let countryInfo = {
+                countryName: element["Country Name"],
+                emissions: new Array(maxYear - minYear + 1),
+                totalEmissions: 0
+            } 
+            countryInfo.emissions.fill(0);
+            countryInfoSet.push(countryInfo);
+        }
+    }
+    console.log(countryInfoSet)
+
+    let emissionIndex = 0;
+    for (let i = minYear; i <= maxYear; i++) {
+        yearLabels.push(i);
+
+        for(const element of datasets[0]) {
+            const selectedCountry = countryInfoSet.filter(e => e.countryName === element["Country Name"]);
+            if (element[i] !== "Not Recorded") {
+                selectedCountry[0].emissions[emissionIndex] += parseFloat(element[i], 10);
+            }
+        }
+
+        for(const element of datasets[1]) {
+            const selectedCountry = countryInfoSet.filter(e => e.countryName === element["Country Name"]);
+            if (element[i] !== "Not Recorded") {
+                selectedCountry[0].emissions[emissionIndex] += parseFloat(element[i], 10);
+            }
+        }
+
+        for(const element of datasets[2]) {
+            const selectedCountry = countryInfoSet.filter(e => e.countryName === element["Country Name"]);
+            if (element[i] !== "Not Recorded") {
+                selectedCountry[0].emissions[emissionIndex] += parseFloat(element[i], 10);
+            }
+        }
+        emissionIndex++;
+    }
+
+    for (const element of countryInfoSet) {
+        element.totalEmissions = element.emissions.reduce((accumulator, currentValue) => accumulator + currentValue);
+    }
+
+    addSelectOptions("co2-global-year", yearLabels);
+    let selectedYear = "";
+    let selectedYearIndex = null;
+    document.getElementById("co2-global-year").addEventListener("change", function() {
+        selectedYear = this.value;
+        if (selectedYear !== "") {
+            selectedYearIndex = yearLabels.indexOf(parseInt(selectedYear, 10));
+        }
+        drawGeoMap(selectedYear, selectedYearIndex);
+    });
+
+    
     const width = 300;
     const height = 300;
 
     const projection = d3.geoMercator()
                             .center([0, 0])
                             .translate([width / 2, height / 2])
-                            .scale(70);
+                            .scale(80);
 
     const path = d3.geoPath()
                     .projection(projection);
+
+    const color = d3.scaleQuantize()
+                        .range(['#f2f0f7','#cbc9e2','#9e9ac8','#756bb1','#54278f']);
 
     const svg = d3.select("#co2-global-chart")
                     .append("svg")
                      .attr("viewBox", `0 0 ${width} ${height}`)
                     .attr("fill", "grey");
 
-    d3.json("data/custom.geo.json")
-        .then(json => {
-            svg.selectAll("path")
-                .data(json.features)
-                .enter()
-                .append("path")
-                .attr("d", path);
-        })
-        .catch(error => {
-            alert("There was a problem with loading the json file. Check the console for more details");
-            console.error(error);
-        });
+    const drawGeoMap = (selectedYear, selectedYearIndex) => {
+        svg.selectAll('*').remove();
+        d3.json(geoJSON)
+            .then(json => {
+                for (const row of countryInfoSet) {
+                    const countryName = row.countryName;
+                    let emissionValue = 0;
+
+                    if (selectedYear === "") {
+                        color.domain([
+                            d3.min(countryInfoSet, d => { return d.totalEmissions; }),
+                            d3.max(countryInfoSet, d => { return d.totalEmissions; }),
+                        ]);
+                        emissionValue = row.totalEmissions;
+                    } else {
+                        color.domain([
+                            d3.min(countryInfoSet, d => { return d.emissions[selectedYearIndex]; }),
+                            d3.max(countryInfoSet, d => { return d.emissions[selectedYearIndex]; }),
+                        ]);
+                        emissionValue = row.emissions[selectedYearIndex];
+                    }
+
+                    for (const element of json.features) {
+                        if (element.properties.name_sort === countryName) {
+                            element.properties.value = emissionValue;
+                            break;
+                        }
+                    }
+
+                }
+
+                // map plotting
+                svg.selectAll("path")
+                    .data(json.features)
+                    .enter()
+                    .append("path")
+                    .attr("d", path)
+                    .style("fill", d => {
+                        const value = d.properties.value;
+                        if (value) {
+                            return color(value);
+                        } else {
+                            return "#ccc";
+                        }
+                    });
+            })
+            .catch(error => {
+                alert("There was a problem with loading the json file. Check the console for more details");
+                console.error(error);
+            });
+    };
+
+
+            // d3.json("LGA_VIC.json")
+            //     .then(json => {
+            //         // iterating over the data rows in the csv file
+            //         for (const row of data) {
+            //             // getting the LGA name
+            //             const rowLGA = row.LGA;
+            //             // getting the unemployed count and parsing it to a string
+            //             const rowUnemployed = parseInt(row.unemployed);
+
+            //             // iterates over the json data
+            //             for (const element of json.features) {
+            //                 // getting the LGA name
+            //                 const elementLGA = element.properties.LGA_name;
+            //                 // check if the LGA name matches
+            //                 if (elementLGA === rowLGA) {
+            //                     // appends the unemployment value from the csv to the json object
+            //                     element.properties.value = rowUnemployed;
+            //                     break;
+            //                 }
+            //             }
+            //         }
+
+            //         // map plotting
+            //         svg.selectAll("path")
+            //             .data(json.features)
+            //             .enter()
+            //             .append("path")
+            //             .attr("d", path)
+            //             .style("fill", d => {
+            //                 const value = d.properties.value;
+            //                 if (value) {
+            //                     return color(value);
+            //                 } else {
+            //                     return "#ccc";
+            //                 }
+            //             });
+
+            //         d3.csv("VIC_city.csv")
+            //             .then(data => {
+            //                 svg.selectAll("circle")
+            //                         .data(data)
+            //                         .enter()
+            //                         .append("circle")
+            //                         .attr("cx", d => { return projection([d.lon, d.lat])[0]; })
+            //                         .attr("cy", d => { return projection([d.lon, d.lat])[1]; })
+            //                         .attr("r", 5)
+            //                         .attr("fill", "red")
+            //                         .attr("stroke", "grey");
+            //             })
+            //             .catch(error => {
+            //                 alert("There was a problem with loading the csv file. Check the console for more details");
+            //                 console.error(error);
+            //             });
+            //     })
+            //     .catch(error => {
+            //         alert("There was a problem with loading the json file. Check the console for more details");
+            //         console.error(error);
+            //     });
+
+
     
     
 };
@@ -654,9 +821,7 @@ const initCharts = async () => {
 
     drawCO2StackedBarChart([co2GasFuelDataset, co2GLiquidFuelDataset, co2SolidFuelDataset], 1960, 2019);
 
-    const globeJSON = await readFromJSON("data/LGA_VIC.json");
-
-    drawCO2GeoMap([co2GasFuelDataset, co2GLiquidFuelDataset, co2SolidFuelDataset], globeJSON);
+    drawCO2GeoMap([co2GasFuelDataset, co2GLiquidFuelDataset, co2SolidFuelDataset], "data/custom.geo.json", 1960, 2019);
 
 };
 
