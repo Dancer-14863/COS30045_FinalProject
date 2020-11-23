@@ -288,7 +288,6 @@ const drawCO2GeoMap = (datasets, geoJSON, minYear, maxYear) => {
             countryInfoSet.push(countryInfo);
         }
     }
-    console.log(countryInfoSet)
 
     let emissionIndex = 0;
     for (let i = minYear; i <= maxYear; i++) {
@@ -322,17 +321,6 @@ const drawCO2GeoMap = (datasets, geoJSON, minYear, maxYear) => {
     }
 
     addSelectOptions("co2-global-year", yearLabels);
-    let selectedYear = "";
-    let selectedYearIndex = null;
-    document.getElementById("co2-global-year").addEventListener("change", function() {
-        selectedYear = this.value;
-        if (selectedYear !== "") {
-            selectedYearIndex = yearLabels.indexOf(parseInt(selectedYear, 10));
-        }
-        drawGeoMap(selectedYear, selectedYearIndex);
-    });
-
-    
     const width = 300;
     const height = 300;
 
@@ -345,7 +333,7 @@ const drawCO2GeoMap = (datasets, geoJSON, minYear, maxYear) => {
                     .projection(projection);
 
     const color = d3.scaleQuantize()
-                        .range(['#f2f0f7','#cbc9e2','#9e9ac8','#756bb1','#54278f']);
+                        .range(['#ffffb2','#fecc5c','#fd8d3c','#f03b20','#bd0026']);
 
     const svg = d3.select("#co2-global-chart")
                     .append("svg")
@@ -383,6 +371,25 @@ const drawCO2GeoMap = (datasets, geoJSON, minYear, maxYear) => {
 
                 }
 
+                const mouseOver = function(d) {
+                    d3.selectAll(".Country")
+                    .transition()
+                    .duration(200)
+                    .style("opacity", .5)
+
+                    d3.select(this)
+                    .transition()
+                    .duration(200)
+                    .style("opacity", 1)
+                }
+
+                const mouseLeave = function(d) {
+                    d3.selectAll(".Country")
+                    .transition()
+                    .duration(200)
+                    .style("opacity", .8)
+                }
+
                 // map plotting
                 svg.selectAll("path")
                     .data(json.features)
@@ -396,7 +403,12 @@ const drawCO2GeoMap = (datasets, geoJSON, minYear, maxYear) => {
                         } else {
                             return "#ccc";
                         }
-                    });
+                    })
+                    .style("stroke", "transparent")
+                    .attr("class", function(d){ return "Country" } )
+                    .style("opacity", .8)
+                    .on("mouseover", mouseOver )
+                    .on("mouseleave", mouseLeave )
             })
             .catch(error => {
                 alert("There was a problem with loading the json file. Check the console for more details");
@@ -404,66 +416,16 @@ const drawCO2GeoMap = (datasets, geoJSON, minYear, maxYear) => {
             });
     };
 
-
-            // d3.json("LGA_VIC.json")
-            //     .then(json => {
-            //         // iterating over the data rows in the csv file
-            //         for (const row of data) {
-            //             // getting the LGA name
-            //             const rowLGA = row.LGA;
-            //             // getting the unemployed count and parsing it to a string
-            //             const rowUnemployed = parseInt(row.unemployed);
-
-            //             // iterates over the json data
-            //             for (const element of json.features) {
-            //                 // getting the LGA name
-            //                 const elementLGA = element.properties.LGA_name;
-            //                 // check if the LGA name matches
-            //                 if (elementLGA === rowLGA) {
-            //                     // appends the unemployment value from the csv to the json object
-            //                     element.properties.value = rowUnemployed;
-            //                     break;
-            //                 }
-            //             }
-            //         }
-
-            //         // map plotting
-            //         svg.selectAll("path")
-            //             .data(json.features)
-            //             .enter()
-            //             .append("path")
-            //             .attr("d", path)
-            //             .style("fill", d => {
-            //                 const value = d.properties.value;
-            //                 if (value) {
-            //                     return color(value);
-            //                 } else {
-            //                     return "#ccc";
-            //                 }
-            //             });
-
-            //         d3.csv("VIC_city.csv")
-            //             .then(data => {
-            //                 svg.selectAll("circle")
-            //                         .data(data)
-            //                         .enter()
-            //                         .append("circle")
-            //                         .attr("cx", d => { return projection([d.lon, d.lat])[0]; })
-            //                         .attr("cy", d => { return projection([d.lon, d.lat])[1]; })
-            //                         .attr("r", 5)
-            //                         .attr("fill", "red")
-            //                         .attr("stroke", "grey");
-            //             })
-            //             .catch(error => {
-            //                 alert("There was a problem with loading the csv file. Check the console for more details");
-            //                 console.error(error);
-            //             });
-            //     })
-            //     .catch(error => {
-            //         alert("There was a problem with loading the json file. Check the console for more details");
-            //         console.error(error);
-            //     });
-
+    let selectedYear = "";
+    let selectedYearIndex = null;
+    drawGeoMap(selectedYear, selectedYearIndex);
+    document.getElementById("co2-global-year").addEventListener("change", function() {
+        selectedYear = this.value;
+        if (selectedYear !== "") {
+            selectedYearIndex = yearLabels.indexOf(parseInt(selectedYear, 10));
+        }
+        drawGeoMap(selectedYear, selectedYearIndex);
+    });
 
     
     
@@ -819,9 +781,9 @@ const initCharts = async () => {
     const co2GLiquidFuelDataset = await readFromCSV("data/API_EN.ATM.CO2E.LF.KT_DS2_en_csv_v2_1350621.csv");
     const co2SolidFuelDataset = await readFromCSV("data/API_EN.ATM.CO2E.SF.KT_DS2_en_csv_v2_1350043.csv");
 
-    drawCO2StackedBarChart([co2GasFuelDataset, co2GLiquidFuelDataset, co2SolidFuelDataset], 1960, 2019);
+    drawCO2StackedBarChart([co2GasFuelDataset, co2GLiquidFuelDataset, co2SolidFuelDataset], 1960, 2016);
 
-    drawCO2GeoMap([co2GasFuelDataset, co2GLiquidFuelDataset, co2SolidFuelDataset], "data/custom.geo.json", 1960, 2019);
+    drawCO2GeoMap([co2GasFuelDataset, co2GLiquidFuelDataset, co2SolidFuelDataset], "data/custom.geo.json", 1960, 2016);
 
 };
 
