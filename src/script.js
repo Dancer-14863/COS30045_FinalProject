@@ -51,7 +51,10 @@ const findLineByLeastSquares = (values_x, values_y) => {
      * Above and below cover edge cases
      */
     if (values_length === 0) {
-        return [ [], [] ];
+        return [
+            [],
+            []
+        ];
     }
 
     /*
@@ -94,8 +97,7 @@ const drawLineChart = (chart, dataset, config, drawTrendLine) => {
     let labels = new Array();
     let chartData = new Array();
 
-    for (const data of dataset)
-    {
+    for (const data of dataset) {
         labels.push(parseFloat(data.Time))
         chartData.push(parseFloat(data.Amount))
     }
@@ -113,23 +115,20 @@ const drawLineChart = (chart, dataset, config, drawTrendLine) => {
 
 const addSelectOptions = (elementID, optionArray) => {
     const element = document.getElementById(elementID);
-    for (const option of optionArray)
-    {
+    for (const option of optionArray) {
         const optionElement = document.createElement("option");
-        optionElement.appendChild( document.createTextNode(option) );
-        optionElement.value =  option; 
-        element.appendChild(optionElement); 
+        optionElement.appendChild(document.createTextNode(option));
+        optionElement.value = option;
+        element.appendChild(optionElement);
     }
 
 };
 
 const getYearValues = (dataset) => {
     let yearValues = new Array();
-    for (const data of dataset)
-    {
+    for (const data of dataset) {
         const year = parseInt(data.Time, 10);
-        if(!yearValues.includes(year))
-        {
+        if (!yearValues.includes(year)) {
             yearValues.push(year);
         }
     }
@@ -143,8 +142,7 @@ const drawCO2StackedBarChart = (datasets, minYear, maxYear) => {
     let co2GasFuelArr = [];
     let co2GLiquidFuelArr = [];
     let co2SolidFuelArr = [];
-    let chartDatasets = [
-        {
+    let chartDatasets = [{
             label: "CO2 Emissions from Gaseous Fuel Consumption",
             data: new Array(maxYear - minYear + 1),
             backgroundColor: 'red'
@@ -253,7 +251,7 @@ const drawCO2StackedBarChart = (datasets, minYear, maxYear) => {
 
     addSelectOptions("co2-fuel-year", labels);
     let selectedYear = "";
-    document.getElementById("co2-fuel-year").addEventListener("change", function() {
+    document.getElementById("co2-fuel-year").addEventListener("change", function () {
         selectedYear = this.value;
         if (selectedYear !== "") {
             const datasetIndex = labels.indexOf(parseInt(selectedYear, 10));
@@ -276,13 +274,13 @@ const drawCO2GeoMap = (datasets, geoJSON, minYear, maxYear) => {
     let countryInfoSet = [];
 
     // this is done because all three datasets have the same country list
-    for(const element of datasets[0]) {
+    for (const element of datasets[0]) {
         if (!countryInfoSet.some(e => e.countryName === element["Country Name"])) {
             let countryInfo = {
                 countryName: element["Country Name"],
                 emissions: new Array(maxYear - minYear + 1),
                 totalEmissions: 0
-            } 
+            }
             countryInfo.emissions.fill(0);
             countryInfoSet.push(countryInfo);
         }
@@ -292,21 +290,21 @@ const drawCO2GeoMap = (datasets, geoJSON, minYear, maxYear) => {
     for (let i = minYear; i <= maxYear; i++) {
         yearLabels.push(i);
 
-        for(const element of datasets[0]) {
+        for (const element of datasets[0]) {
             const selectedCountry = countryInfoSet.filter(e => e.countryName === element["Country Name"]);
             if (element[i] !== "Not Recorded") {
                 selectedCountry[0].emissions[emissionIndex] += parseFloat(element[i], 10);
             }
         }
 
-        for(const element of datasets[1]) {
+        for (const element of datasets[1]) {
             const selectedCountry = countryInfoSet.filter(e => e.countryName === element["Country Name"]);
             if (element[i] !== "Not Recorded") {
                 selectedCountry[0].emissions[emissionIndex] += parseFloat(element[i], 10);
             }
         }
 
-        for(const element of datasets[2]) {
+        for (const element of datasets[2]) {
             const selectedCountry = countryInfoSet.filter(e => e.countryName === element["Country Name"]);
             if (element[i] !== "Not Recorded") {
                 selectedCountry[0].emissions[emissionIndex] += parseFloat(element[i], 10);
@@ -320,24 +318,66 @@ const drawCO2GeoMap = (datasets, geoJSON, minYear, maxYear) => {
     }
 
     addSelectOptions("co2-global-year", yearLabels);
+
+
+    const reset = () => {
+        svg.transition().duration(750).call(
+            zoom.transform,
+            d3.zoomIdentity,
+            d3.zoomTransform(svg.node()).invert([width / 2, height / 2])
+        );
+    };
+
+    const zoomed = event => {
+        const g = svg.selectAll("path");
+        const {
+            transform
+        } = event;
+        g.attr("transform", transform);
+        g.attr("stroke-width", 1 / transform.k);
+    };
+
+    const clicked = (event, d) => {
+        const [
+            [x0, y0],
+            [x1, y1]
+        ] = path.bounds(d);
+        event.stopPropagation();
+        d3.select(this).transition().style("fill", "red");
+        svg.transition().duration(750).call(
+            zoom.transform,
+            d3.zoomIdentity
+            .translate(width / 2, height / 2)
+            .scale(Math.min(8, 0.9 / Math.max((x1 - x0) / width, (y1 - y0) / height)))
+            .translate(-(x0 + x1) / 2, -(y0 + y1) / 2),
+            d3.pointer(event, svg.node())
+        );
+    }
+
+
     const width = 300;
     const height = 300;
 
     const projection = d3.geoMercator()
-                            .center([0, 0])
-                            .translate([width / 2, height / 2])
-                            .scale(80);
+        .center([0, 0])
+        .translate([width / 2, height / 2])
+        .scale(80);
 
     const path = d3.geoPath()
-                    .projection(projection);
+        .projection(projection);
 
     const color = d3.scaleQuantize()
-                        .range(['#ffffb2','#fecc5c','#fd8d3c','#f03b20','#bd0026']);
+        .range(['#ffffb2', '#fecc5c', '#fd8d3c', '#f03b20', '#bd0026']);
 
     const svg = d3.select("#co2-global-chart")
-                    .append("svg")
-                    .attr("viewBox", `0 0 ${width} ${height}`)
-                    .attr("fill", "grey");
+        .append("svg")
+        .attr("viewBox", `0 0 ${width} ${height}`)
+        .attr("fill", "grey")
+        .on("click", reset);
+
+    const zoom = d3.zoom()
+        .scaleExtent([1, 8])
+        .on("zoom", zoomed);
 
     const drawGeoMap = (selectedYear, selectedYearIndex) => {
         svg.selectAll('*').remove();
@@ -349,14 +389,22 @@ const drawCO2GeoMap = (datasets, geoJSON, minYear, maxYear) => {
 
                     if (selectedYear === "") {
                         color.domain([
-                            d3.min(countryInfoSet, d => { return d.totalEmissions; }),
-                            d3.max(countryInfoSet, d => { return d.totalEmissions; }),
+                            d3.min(countryInfoSet, d => {
+                                return d.totalEmissions;
+                            }),
+                            d3.max(countryInfoSet, d => {
+                                return d.totalEmissions;
+                            }),
                         ]);
                         emissionValue = row.totalEmissions;
                     } else {
                         color.domain([
-                            d3.min(countryInfoSet, d => { return d.emissions[selectedYearIndex]; }),
-                            d3.max(countryInfoSet, d => { return d.emissions[selectedYearIndex]; }),
+                            d3.min(countryInfoSet, d => {
+                                return d.emissions[selectedYearIndex];
+                            }),
+                            d3.max(countryInfoSet, d => {
+                                return d.emissions[selectedYearIndex];
+                            }),
                         ]);
                         emissionValue = row.emissions[selectedYearIndex];
                     }
@@ -371,23 +419,23 @@ const drawCO2GeoMap = (datasets, geoJSON, minYear, maxYear) => {
                 }
 
                 // map plotting 
-                svg.selectAll("path") 
+                svg.selectAll("path")
                     .data(json.features)
-                    .enter() 
-                    .append("path") 
-                    .attr("d", path) 
-                    .style("fill", d => { 
-                        const value = d.properties.value; 
-                        if (value) { 
-                            return color(value); 
-                        } else { 
-                            return "#ccc"; 
-                        } 
-                    }) 
-                    .style("stroke", "transparent") 
-                    .attr("class", function(d){ 
-                        return "Country" 
-                    }) 
+                    .enter()
+                    .append("path")
+                    .attr("d", path)
+                    .style("fill", d => {
+                        const value = d.properties.value;
+                        if (value) {
+                            return color(value);
+                        } else {
+                            return "#ccc";
+                        }
+                    })
+                    .style("stroke", "transparent")
+                    .attr("class", function (d) {
+                        return "Country"
+                    })
                     .style("opacity", .8)
                     .on("mouseover", function (d, i) {
                         d3.select("#tooltip")
@@ -409,16 +457,18 @@ const drawCO2GeoMap = (datasets, geoJSON, minYear, maxYear) => {
                             .duration(200)
                             .style("opacity", 1);
                     })
-                    .on("mouseleave", function(d, i)  {
+                    .on("mouseleave", function (d, i) {
                         //Show the tooltip
                         d3.select("#tooltip").classed("hidden", true);
                         d3.selectAll(".Country")
                             .transition()
                             .duration(200)
                             .style("opacity", .8);
-                    });
+                    })
+                    .on("click", clicked);
 
 
+                svg.call(zoom);
 
             })
             .catch(error => {
@@ -430,7 +480,7 @@ const drawCO2GeoMap = (datasets, geoJSON, minYear, maxYear) => {
     let selectedYear = "";
     let selectedYearIndex = null;
     drawGeoMap(selectedYear, selectedYearIndex);
-    document.getElementById("co2-global-year").addEventListener("change", function() {
+    document.getElementById("co2-global-year").addEventListener("change", function () {
         selectedYear = this.value;
         if (selectedYear !== "") {
             selectedYearIndex = yearLabels.indexOf(parseInt(selectedYear, 10));
@@ -438,14 +488,13 @@ const drawCO2GeoMap = (datasets, geoJSON, minYear, maxYear) => {
         drawGeoMap(selectedYear, selectedYearIndex);
     });
 
-    
-    
+
+
 };
 
 
 const initCharts = async () => {
-    const lineChartConfig = [
-        {
+    const lineChartConfig = [{
             chartElementName: "gistemp-chart",
             yearFilterElementName: "gistemp-year",
             datasetFile: "data/gistemp.csv",
@@ -775,7 +824,7 @@ const initCharts = async () => {
         drawLineChart(chart, dataset, element.mainChartConfig, true);
 
         let selectedYear = "";
-        document.getElementById(element.yearFilterElementName).addEventListener("change", function() {
+        document.getElementById(element.yearFilterElementName).addEventListener("change", function () {
             selectedYear = this.value;
             if (selectedYear !== "") {
                 const filteredDataset = dataset.filter(data => data.Time >= selectedYear && data.Time <= selectedYear + 1);
