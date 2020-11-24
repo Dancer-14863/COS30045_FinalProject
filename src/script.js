@@ -343,7 +343,6 @@ const drawCO2GeoMap = (datasets, geoJSON, minYear, maxYear) => {
             [x1, y1]
         ] = path.bounds(d);
         event.stopPropagation();
-        d3.select(this).transition().style("fill", "red");
         svg.transition().duration(750).call(
             zoom.transform,
             d3.zoomIdentity
@@ -445,6 +444,7 @@ const drawCO2GeoMap = (datasets, geoJSON, minYear, maxYear) => {
                         d3.select("#tooltip")
                             .select("#tooltip-value")
                             .text(parseInt(i.properties.value).toLocaleString());
+
                         d3.select("#tooltip").classed("hidden", false);
 
                         d3.selectAll(".Country")
