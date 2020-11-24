@@ -28,7 +28,6 @@ const readFromJSON = async fileName => {
     }
 }
 
-
 // taken from https://medium.com/@sahirnambiar/linear-least-squares-a-javascript-implementation-and-a-definitional-question-e3fba55a6d4b 
 const findLineByLeastSquares = (values_x, values_y) => {
     let x_sum = 0;
@@ -337,7 +336,7 @@ const drawCO2GeoMap = (datasets, geoJSON, minYear, maxYear) => {
 
     const svg = d3.select("#co2-global-chart")
                     .append("svg")
-                     .attr("viewBox", `0 0 ${width} ${height}`)
+                    .attr("viewBox", `0 0 ${width} ${height}`)
                     .attr("fill", "grey");
 
     const drawGeoMap = (selectedYear, selectedYearIndex) => {
@@ -371,44 +370,56 @@ const drawCO2GeoMap = (datasets, geoJSON, minYear, maxYear) => {
 
                 }
 
-                const mouseOver = function(d) {
-                    d3.selectAll(".Country")
-                    .transition()
-                    .duration(200)
-                    .style("opacity", .5)
-
-                    d3.select(this)
-                    .transition()
-                    .duration(200)
-                    .style("opacity", 1)
-                }
-
-                const mouseLeave = function(d) {
-                    d3.selectAll(".Country")
-                    .transition()
-                    .duration(200)
-                    .style("opacity", .8)
-                }
-
-                // map plotting
-                svg.selectAll("path")
+                // map plotting 
+                svg.selectAll("path") 
                     .data(json.features)
-                    .enter()
-                    .append("path")
-                    .attr("d", path)
-                    .style("fill", d => {
-                        const value = d.properties.value;
-                        if (value) {
-                            return color(value);
-                        } else {
-                            return "#ccc";
-                        }
-                    })
-                    .style("stroke", "transparent")
-                    .attr("class", function(d){ return "Country" } )
+                    .enter() 
+                    .append("path") 
+                    .attr("d", path) 
+                    .style("fill", d => { 
+                        const value = d.properties.value; 
+                        if (value) { 
+                            return color(value); 
+                        } else { 
+                            return "#ccc"; 
+                        } 
+                    }) 
+                    .style("stroke", "transparent") 
+                    .attr("class", function(d){ 
+                        return "Country" 
+                    }) 
                     .style("opacity", .8)
-                    .on("mouseover", mouseOver )
-                    .on("mouseleave", mouseLeave )
+                    .on("mouseover", function (d, i) {
+                        d3.select("#tooltip")
+                            .select("#tooltip-title")
+                            .text(i.properties.name_sort);
+
+                        d3.select("#tooltip")
+                            .select("#tooltip-value")
+                            .text(parseInt(i.properties.value).toLocaleString());
+                        d3.select("#tooltip").classed("hidden", false);
+
+                        d3.selectAll(".Country")
+                            .transition()
+                            .duration(200)
+                            .style("opacity", .4);
+
+                        d3.select(this)
+                            .transition()
+                            .duration(200)
+                            .style("opacity", 1);
+                    })
+                    .on("mouseleave", function(d, i)  {
+                        //Show the tooltip
+                        d3.select("#tooltip").classed("hidden", true);
+                        d3.selectAll(".Country")
+                            .transition()
+                            .duration(200)
+                            .style("opacity", .8);
+                    });
+
+
+
             })
             .catch(error => {
                 alert("There was a problem with loading the json file. Check the console for more details");

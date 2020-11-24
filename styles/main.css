@@ -97,14 +97,50 @@ nav ul li a:hover {
 }
 
 .chart-container {
+    margin-top: 1rem;
     position: relative;
-    height: 60vh;
-    width: 80vw;
+    max-height: auto;
+    max-width: 80vw;
+    background-color: #191716;
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-container canvas {
+    max-height: 100%;
+    max-width: 100%;
 }
 
 #co2-global-chart svg {
     margin-top: 1rem;
-    height: 60vh;
-    width: 80vw;
-    background-color: #191716;
+    max-height: 60vh;
+    max-width: 80vw;
+}
+
+#tooltip {
+    position: absolute;
+    width: 10rem;
+    height: auto;
+    padding: 10px;
+    background-color: white;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+    -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+}
+.hidden {
+    display: none;
+}
+#tooltip {
+    margin: 0;
+    font-family: sans-serif;
+    font-size: 0.9rem;
+    color: var(--primary);
+}
+
+#tooltip #tooltip-value{
+    margin-top: 4rem;
 }
