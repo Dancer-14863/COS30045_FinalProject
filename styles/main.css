@@ -111,6 +111,13 @@ nav ul li a:hover {
     height: 100vh;
 }
 
+.chart-card h1 {
+    margin-top: 1rem;
+    color: var(--font-secondary);
+    text-align: center;
+    font-weight: bolder;
+}
+
 .chart-container {
     margin-top: 1rem;
     position: relative;
@@ -133,9 +140,10 @@ nav ul li a:hover {
     grid-template-areas:
         "chart legend";
 }
+
 #co2-global-chart svg {
     margin-top: 1rem;
-    max-height: 60vh;
+    max-height: 80vh;
 }
 
 #tooltip {
