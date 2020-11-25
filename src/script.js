@@ -269,47 +269,32 @@ const drawCO2StackedBarChart = (datasets, minYear, maxYear) => {
     });
 };
 
-const drawCO2GeoMap = (datasets, geoJSON, minYear, maxYear) => {
+const drawCO2GeoMap = (dataset, geoJSON, minYear, maxYear) => {
     let yearLabels = [];
     let countryInfoSet = [];
-
-    // this is done because all three datasets have the same country list
-    for (const element of datasets[0]) {
-        if (!countryInfoSet.some(e => e.countryName === element["Country Name"])) {
-            let countryInfo = {
-                countryName: element["Country Name"],
-                emissions: new Array(maxYear - minYear + 1),
-                totalEmissions: 0
-            }
-            countryInfo.emissions.fill(0);
-            countryInfoSet.push(countryInfo);
-        }
-    }
 
     let emissionIndex = 0;
     for (let i = minYear; i <= maxYear; i++) {
         yearLabels.push(i);
 
-        for (const element of datasets[0]) {
+        for (const element of dataset) {
+
+            if (!countryInfoSet.some(e => e.countryName === element["Country Name"])) {
+                let countryInfo = {
+                    countryName: element["Country Name"],
+                    emissions: new Array(maxYear - minYear + 1),
+                    totalEmissions: 0
+                }
+                countryInfo.emissions.fill(0);
+                countryInfoSet.push(countryInfo);
+            }
+
             const selectedCountry = countryInfoSet.filter(e => e.countryName === element["Country Name"]);
             if (element[i] !== "Not Recorded") {
-                selectedCountry[0].emissions[emissionIndex] += parseFloat(element[i], 10);
+                selectedCountry[0].emissions[emissionIndex] = parseFloat(element[i], 10);
             }
         }
 
-        for (const element of datasets[1]) {
-            const selectedCountry = countryInfoSet.filter(e => e.countryName === element["Country Name"]);
-            if (element[i] !== "Not Recorded") {
-                selectedCountry[0].emissions[emissionIndex] += parseFloat(element[i], 10);
-            }
-        }
-
-        for (const element of datasets[2]) {
-            const selectedCountry = countryInfoSet.filter(e => e.countryName === element["Country Name"]);
-            if (element[i] !== "Not Recorded") {
-                selectedCountry[0].emissions[emissionIndex] += parseFloat(element[i], 10);
-            }
-        }
         emissionIndex++;
     }
 
@@ -365,8 +350,7 @@ const drawCO2GeoMap = (datasets, geoJSON, minYear, maxYear) => {
     const path = d3.geoPath()
         .projection(projection);
 
-    const color = d3.scaleQuantize()
-        .range(['#ffffb2', '#fecc5c', '#fd8d3c', '#f03b20', '#bd0026']);
+    let color;
 
     const svg = d3.select("#co2-global-chart")
         .append("svg")
@@ -377,45 +361,61 @@ const drawCO2GeoMap = (datasets, geoJSON, minYear, maxYear) => {
     const zoom = d3.zoom()
         .scaleExtent([1, 8])
         .on("zoom", zoomed);
+    
+    const quantile = (array, percentile) => {
+        array.sort((a, b) => { return a - b; });
+        const index = percentile/100. * (array.length-1);
+        let result;
+        if (Math.floor(index) == index) {
+    	    result = array[index];
+        } else {
+            const i = Math.floor(index)
+            const fraction = index - i;
+            result = array[i] + (array[i+1] - array[i]) * fraction;
+        }
+        return result;
+    };
 
     const drawGeoMap = (selectedYear, selectedYearIndex) => {
         svg.selectAll('*').remove();
         d3.json(geoJSON)
             .then(json => {
+                    if (selectedYear === "") {
+                        let emissionValues = [];
+                        for (const element of countryInfoSet) {
+                            emissionValues.push(element.totalEmissions);
+                        }
+                        color = d3.scaleSequentialQuantile([...emissionValues], d3.interpolatePurples);
+                    } else {
+                        let emissionValues = [];
+                        for (const element of countryInfoSet) {
+                            emissionValues.push(element.emissions[selectedYearIndex]);
+                        }
+                        color = d3.scaleSequentialQuantile([...emissionValues], d3.interpolatePurples);
+                    }
                 for (const row of countryInfoSet) {
                     const countryName = row.countryName;
                     let emissionValue = 0;
 
                     if (selectedYear === "") {
-                        color.domain([
-                            d3.min(countryInfoSet, d => {
-                                return d.totalEmissions;
-                            }),
-                            d3.max(countryInfoSet, d => {
-                                return d.totalEmissions;
-                            }),
-                        ]);
                         emissionValue = row.totalEmissions;
                     } else {
-                        color.domain([
-                            d3.min(countryInfoSet, d => {
-                                return d.emissions[selectedYearIndex];
-                            }),
-                            d3.max(countryInfoSet, d => {
-                                return d.emissions[selectedYearIndex];
-                            }),
-                        ]);
                         emissionValue = row.emissions[selectedYearIndex];
                     }
 
                     for (const element of json.features) {
                         if (element.properties.name_sort === countryName) {
-                            element.properties.value = emissionValue;
+                            element.properties.value = parseFloat(emissionValue).toFixed(2);
                             break;
-                        }
+                        } 
                     }
 
                 }
+                    for (const element of json.features) {
+                        if (!("value" in element.properties) || element.properties.value <= 0) {
+                            element.properties.value = "Not recorded";
+                        }
+                    }
 
                 // map plotting 
                 svg.selectAll("path")
@@ -443,7 +443,9 @@ const drawCO2GeoMap = (datasets, geoJSON, minYear, maxYear) => {
 
                         d3.select("#tooltip")
                             .select("#tooltip-value")
-                            .text(parseInt(i.properties.value).toLocaleString());
+                            .text(
+                                `${i.properties.value === "Not recorded" ? "Not recorded" : `${i.properties.value} kt per capita`}`
+                             );
 
                         d3.select("#tooltip").classed("hidden", false);
 
@@ -843,7 +845,8 @@ const initCharts = async () => {
 
     drawCO2StackedBarChart([co2GasFuelDataset, co2GLiquidFuelDataset, co2SolidFuelDataset], 1960, 2016);
 
-    drawCO2GeoMap([co2GasFuelDataset, co2GLiquidFuelDataset, co2SolidFuelDataset], "data/custom.geo.json", 1960, 2016);
+    const co2GlobalPerCapita = await readFromCSV("data/API_EN.ATM.CO2E.PC_DS2_en_csv_v2_1680019.csv");
+    drawCO2GeoMap(co2GlobalPerCapita, "data/custom.geo.json", 1960, 2016);
 
 };
 
