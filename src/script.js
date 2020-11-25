@@ -350,28 +350,37 @@ const drawCO2GeoMap = (dataset, geoJSON, minYear, maxYear) => {
     const path = d3.geoPath()
         .projection(projection);
 
-    let color;
+    const color = d3.scaleThreshold()
+        .range(
+            ['#f2f0f7', '#cbc9e2', '#9e9ac8', '#756bb1', '#54278f']
+        );
 
     const svg = d3.select("#co2-global-chart")
         .append("svg")
         .attr("viewBox", `0 0 ${width} ${height}`)
         .attr("fill", "grey")
         .on("click", reset);
+    const legendContainer = d3.select("#co2-global-chart")
+        .append("svg")
+        .attr("viewBox", `0 0 ${100} ${100}`)
+        .attr("fill", "grey")
 
     const zoom = d3.zoom()
         .scaleExtent([1, 8])
         .on("zoom", zoomed);
-    
+
     const quantile = (array, percentile) => {
-        array.sort((a, b) => { return a - b; });
-        const index = percentile/100. * (array.length-1);
+        array.sort((a, b) => {
+            return a - b;
+        });
+        const index = percentile / 100. * (array.length - 1);
         let result;
         if (Math.floor(index) == index) {
-    	    result = array[index];
+            result = array[index];
         } else {
             const i = Math.floor(index)
             const fraction = index - i;
-            result = array[i] + (array[i+1] - array[i]) * fraction;
+            result = array[i] + (array[i + 1] - array[i]) * fraction;
         }
         return result;
     };
@@ -380,19 +389,51 @@ const drawCO2GeoMap = (dataset, geoJSON, minYear, maxYear) => {
         svg.selectAll('*').remove();
         d3.json(geoJSON)
             .then(json => {
-                    if (selectedYear === "") {
-                        let emissionValues = [];
-                        for (const element of countryInfoSet) {
-                            emissionValues.push(element.totalEmissions);
-                        }
-                        color = d3.scaleSequentialQuantile([...emissionValues], d3.interpolatePurples);
-                    } else {
-                        let emissionValues = [];
-                        for (const element of countryInfoSet) {
-                            emissionValues.push(element.emissions[selectedYearIndex]);
-                        }
-                        color = d3.scaleSequentialQuantile([...emissionValues], d3.interpolatePurples);
+                if (selectedYear === "") {
+                    let emissionValues = [];
+                    for (const element of countryInfoSet) {
+                        emissionValues.push(element.totalEmissions);
                     }
+                    color.domain(
+                        [
+                            quantile(emissionValues, 80),
+                            quantile(emissionValues, 84),
+                            quantile(emissionValues, 88),
+                            quantile(emissionValues, 92),
+                            quantile(emissionValues, 96),
+                        ]
+                    );
+                } else {
+                    let emissionValues = [];
+                    for (const element of countryInfoSet) {
+                        emissionValues.push(element.emissions[selectedYearIndex]);
+                    }
+                    color.domain(
+                        [
+                            quantile(emissionValues, 80),
+                            quantile(emissionValues, 84),
+                            quantile(emissionValues, 88),
+                            quantile(emissionValues, 92),
+                            quantile(emissionValues, 96),
+                        ]
+                    );
+                }
+
+                legendContainer
+                    .attr("id", "legend-container")
+
+                legendContainer.append("g")
+                    .attr("class", "legendQuant")
+
+                const legend = d3.legendColor()
+                    .labelFormat(d3.format(".2f"))
+                    .labels(d3.legendHelpers.thresholdLabels)
+                    .scale(color)
+
+
+                legendContainer.select(".legendQuant")
+                    .call(legend);
+
                 for (const row of countryInfoSet) {
                     const countryName = row.countryName;
                     let emissionValue = 0;
@@ -407,15 +448,15 @@ const drawCO2GeoMap = (dataset, geoJSON, minYear, maxYear) => {
                         if (element.properties.name_sort === countryName) {
                             element.properties.value = parseFloat(emissionValue).toFixed(2);
                             break;
-                        } 
+                        }
                     }
 
                 }
-                    for (const element of json.features) {
-                        if (!("value" in element.properties) || element.properties.value <= 0) {
-                            element.properties.value = "Not recorded";
-                        }
+                for (const element of json.features) {
+                    if (!("value" in element.properties) || element.properties.value <= 0) {
+                        element.properties.value = "Not recorded";
                     }
+                }
 
                 // map plotting 
                 svg.selectAll("path")
@@ -425,7 +466,7 @@ const drawCO2GeoMap = (dataset, geoJSON, minYear, maxYear) => {
                     .attr("d", path)
                     .style("fill", d => {
                         const value = d.properties.value;
-                        if (value) {
+                        if (value !== "Not recorded") {
                             return color(value);
                         } else {
                             return "#ccc";
@@ -445,7 +486,7 @@ const drawCO2GeoMap = (dataset, geoJSON, minYear, maxYear) => {
                             .select("#tooltip-value")
                             .text(
                                 `${i.properties.value === "Not recorded" ? "Not recorded" : `${i.properties.value} kt per capita`}`
-                             );
+                            );
 
                         d3.select("#tooltip").classed("hidden", false);
 
