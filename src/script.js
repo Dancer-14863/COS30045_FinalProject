@@ -239,6 +239,9 @@ const drawCO2StackedBarChart = (datasets, minYear, maxYear) => {
                         drawOnChartArea: false,
                         color: "#000"
                     },
+                    ticks: {
+                        beginAtZero: true
+                    },
                     stacked: true,
                 }]
             }
@@ -254,12 +257,16 @@ const drawCO2StackedBarChart = (datasets, minYear, maxYear) => {
     document.getElementById("co2-fuel-year").addEventListener("change", function () {
         selectedYear = this.value;
         if (selectedYear !== "") {
+            chartConfig.options.scales.xAxes[0].stacked = false;
+            chartConfig.options.scales.yAxes[0].stacked = false;
             const datasetIndex = labels.indexOf(parseInt(selectedYear, 10));
             chartConfig.data.labels = [labels[datasetIndex]];
             chartDatasets[0].data = [co2GasFuelArr[datasetIndex]];
             chartDatasets[1].data = [co2GLiquidFuelArr[datasetIndex]];
             chartDatasets[2].data = [co2SolidFuelArr[datasetIndex]];
         } else {
+            chartConfig.options.scales.xAxes[0].stacked = true;
+            chartConfig.options.scales.yAxes[0].stacked = true;
             chartConfig.data.labels = labels;
             chartDatasets[0].data = co2GasFuelArr;
             chartDatasets[1].data = co2GLiquidFuelArr;
@@ -891,7 +898,24 @@ const initCharts = async () => {
 
 };
 
+const setupNavLinks = () => {
+    const navLinks = document.querySelectorAll("nav ul li a");
+
+    for (const link of navLinks) {
+        link.addEventListener("click", function() {
+            const currentActive = document.getElementsByClassName("active");
+
+            if (currentActive.length != 0) {
+                currentActive[0].className = currentActive[0].className.replace(" active", "");
+            }
+
+            this.className += " active";
+        });
+    }
+};
+
 const main = async () => {
+    setupNavLinks();
     initCharts();
 };
 
