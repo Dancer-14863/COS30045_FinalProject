@@ -18,6 +18,11 @@ const readFromCSV = async fileName => {
     }
 }
 
+/**
+ * Reads data from a json file using the d3 library.
+ * Returns null if the file cannot be read
+ * @param {String} fileName - name of the file to be read
+ */
 const readFromJSON = async fileName => {
     let dataset = null;
     try {
@@ -93,6 +98,14 @@ const findLineByLeastSquares = (values_x, values_y) => {
     return [result_values_x, result_values_y];
 }
 
+/**
+ * Draws a line chart using the chart.js library
+ * 
+ * @param {*} chart - Chart.js object
+ * @param {*} dataset - Dataset to be plotted
+ * @param {*} config - Chart.js configuration
+ * @param {bool} drawTrendLine - Whether a trend line should be plotted or not
+ */
 const drawLineChart = (chart, dataset, config, drawTrendLine) => {
     let labels = new Array();
     let chartData = new Array();
@@ -113,6 +126,11 @@ const drawLineChart = (chart, dataset, config, drawTrendLine) => {
     chart.update();
 }
 
+/**
+ * Adds the passed options to a select element
+ * @param {string} elementID - ID of the select element to add options to
+ * @param {*} optionArray - Array containing option values
+ */
 const addSelectOptions = (elementID, optionArray) => {
     const element = document.getElementById(elementID);
     for (const option of optionArray) {
@@ -124,6 +142,11 @@ const addSelectOptions = (elementID, optionArray) => {
 
 };
 
+/**
+ * Gets the year values from a line chart dataset and 
+ * returns it as an array
+ * @param {*} dataset - Line chart dataset
+ */
 const getYearValues = (dataset) => {
     let yearValues = new Array();
     for (const data of dataset) {
@@ -136,6 +159,13 @@ const getYearValues = (dataset) => {
 }
 
 
+/**
+ * Draws the co2 emission from fuel barchart
+ * 
+ * @param {*} datasets - Array which contains the three datasets which have to be plotted
+ * @param {number} minYear - Starting year of teh dataset
+ * @param {number} maxYear - Ending year of the dataset
+ */
 const drawCO2StackedBarChart = (datasets, minYear, maxYear) => {
     const ctx = document.getElementById("co2-fuel-chart").getContext("2d");
     const chart = new Chart(ctx);
@@ -162,6 +192,11 @@ const drawCO2StackedBarChart = (datasets, minYear, maxYear) => {
     chartDatasets[1].data.fill(0);
     chartDatasets[2].data.fill(0);
     const labels = [];
+
+    /**
+     * Loops through all three datasets and pushes the emission values from the
+     * record with the World data
+     */
     for (let i = minYear; i <= maxYear; i++) {
         let co2GasFuel = 0;
         let co2GLiquidFuel = 0;
@@ -196,6 +231,7 @@ const drawCO2StackedBarChart = (datasets, minYear, maxYear) => {
     chartDatasets[1].data = co2GLiquidFuelArr;
     chartDatasets[2].data = co2SolidFuelArr;
 
+    // chart.js config for stacked barchat
     const chartConfig = {
         type: 'bar',
         data: {
@@ -252,19 +288,24 @@ const drawCO2StackedBarChart = (datasets, minYear, maxYear) => {
     chart.options = chartConfig.options;
     chart.update();
 
+    // adds event listener to filter element
     addSelectOptions("co2-fuel-year", labels);
     let selectedYear = "";
     document.getElementById("co2-fuel-year").addEventListener("change", function () {
         selectedYear = this.value;
         if (selectedYear !== "") {
+            // disables stacking
             chartConfig.options.scales.xAxes[0].stacked = false;
             chartConfig.options.scales.yAxes[0].stacked = false;
+            // gets the index of the selected year from the array
             const datasetIndex = labels.indexOf(parseInt(selectedYear, 10));
             chartConfig.data.labels = [labels[datasetIndex]];
+            // gets the data for the selected year
             chartDatasets[0].data = [co2GasFuelArr[datasetIndex]];
             chartDatasets[1].data = [co2GLiquidFuelArr[datasetIndex]];
             chartDatasets[2].data = [co2SolidFuelArr[datasetIndex]];
         } else {
+            // enables stacking
             chartConfig.options.scales.xAxes[0].stacked = true;
             chartConfig.options.scales.yAxes[0].stacked = true;
             chartConfig.data.labels = labels;
@@ -276,16 +317,33 @@ const drawCO2StackedBarChart = (datasets, minYear, maxYear) => {
     });
 };
 
+
+/**
+ * Draws the co2 emission choropleth map
+ * 
+ * @param {*} dataset - Dataset with data to be plotted
+ * @param {string} geoJSON - Name of the GeoJSON file
+ * @param {number} minYear - Starting year of teh dataset
+ * @param {number} maxYear - Ending year of the dataset
+ */
 const drawCO2GeoMap = (dataset, geoJSON, minYear, maxYear) => {
     let yearLabels = [];
     let countryInfoSet = [];
 
     let emissionIndex = 0;
+    /**
+     * Used to initialize yearLabels array with year value and fill the countryInfoSet object
+     * array with data from the dataset
+     */
     for (let i = minYear; i <= maxYear; i++) {
         yearLabels.push(i);
 
         for (const element of dataset) {
 
+            /**
+             * Checks if an element in the object array already with a particular country code
+             * if not a new object is created and pushed into the array
+             */
             if (!countryInfoSet.some(e => e.countryCode === element["Country Code"])) {
                 let countryInfo = {
                     countryCode: element["Country Code"],
@@ -297,6 +355,7 @@ const drawCO2GeoMap = (dataset, geoJSON, minYear, maxYear) => {
                 countryInfoSet.push(countryInfo);
             }
 
+            // gets the data from the dataset that matches the country code
             const selectedCountry = countryInfoSet.filter(e => e.countryCode === element["Country Code"]);
             if (element[i] !== "Not Recorded") {
                 selectedCountry[0].emissions[emissionIndex] = parseFloat(element[i], 10);
@@ -306,13 +365,20 @@ const drawCO2GeoMap = (dataset, geoJSON, minYear, maxYear) => {
         emissionIndex++;
     }
 
+    // calculates the total emissions for every country in the countryInfoSet array
     for (const element of countryInfoSet) {
         element.totalEmissions = element.emissions.reduce((accumulator, currentValue) => accumulator + currentValue);
     }
-
+    
+    // adds the year filter options
     addSelectOptions("co2-global-year", yearLabels);
 
 
+    /*
+        The reset, zoomed and clicked function were created by referencing 
+        https://observablehq.com/@d3/zoom-to-bounding-box?collection=@d3/d3-zoom
+        an example from the d3-zoom documentation
+    */
     const reset = () => {
         svg.transition().duration(750).call(
             zoom.transform,
@@ -368,6 +434,7 @@ const drawCO2GeoMap = (dataset, geoJSON, minYear, maxYear) => {
         .attr("viewBox", `0 0 ${width} ${height}`)
         .attr("fill", "grey")
         .on("click", reset);
+
     const legendContainer = d3.select("#co2-global-chart")
         .append("svg")
         .attr("viewBox", `0 0 ${100} ${100}`)
@@ -377,6 +444,14 @@ const drawCO2GeoMap = (dataset, geoJSON, minYear, maxYear) => {
         .scaleExtent([1, 8])
         .on("zoom", zoomed);
 
+    /**
+     * Calculates and returns the percentile of an array
+     * Made by following this example
+     * https://jsfiddle.net/PBrockmann/der72ot0/
+     * 
+     * @param {number[]) array - Number array
+     * @param {number} percentile - Percentile to calculate
+     */
     const quantile = (array, percentile) => {
         array.sort((a, b) => {
             return a - b;
@@ -393,10 +468,23 @@ const drawCO2GeoMap = (dataset, geoJSON, minYear, maxYear) => {
         return result;
     };
 
+    /**
+     * Filters the data according to passed year and draws the 
+     * geo map using it
+     * 
+     * @param {string} selectedYear - The year the user has selected
+     * @param {number} selectedYearIndex - The index of that year in the array
+     */
     const drawGeoMap = (selectedYear, selectedYearIndex) => {
+        // removes all child elements, used to reset the graph
         svg.selectAll('*').remove();
+
         d3.json(geoJSON)
             .then(json => {
+                /*
+                    selectedYear value is empty only when the user
+                    selects the "All" option from the filter menu
+                */
                 if (selectedYear === "") {
                     let emissionValues = [];
                     for (const element of countryInfoSet) {
@@ -427,6 +515,11 @@ const drawCO2GeoMap = (dataset, geoJSON, minYear, maxYear) => {
                     );
                 }
 
+                /**
+                 * legend was created following example from 
+                 * https://d3-legend.susielu.com/#color-threshold
+                 * the d3-legend documentation
+                 */
                 legendContainer
                     .attr("id", "legend-container")
 
@@ -452,6 +545,7 @@ const drawCO2GeoMap = (dataset, geoJSON, minYear, maxYear) => {
                         emissionValue = row.emissions[selectedYearIndex];
                     }
 
+                    // writes the emission values in to the geo json
                     for (const element of json.features) {
                         if (element.properties.iso_a3 === countryCode) {
                             element.properties.value = parseFloat(emissionValue).toFixed(2);
@@ -460,6 +554,11 @@ const drawCO2GeoMap = (dataset, geoJSON, minYear, maxYear) => {
                     }
 
                 }
+
+                /**
+                 * Loops through the geo json values. If it is undefined or 0 it's value
+                 * is set to Not recorded
+                 */
                 for (const element of json.features) {
                     if (!("value" in element.properties) || element.properties.value <= 0) {
                         element.properties.value = "Not recorded";
@@ -485,6 +584,11 @@ const drawCO2GeoMap = (dataset, geoJSON, minYear, maxYear) => {
                         return "Country"
                     })
                     .style("opacity", .8)
+                    /*
+                        Hover effects were added following the example
+                        https://www.d3-graph-gallery.com/graph/choropleth_hover_effect.html
+                        on the d3 graph gallery page
+                    */
                     .on("mouseover", function (d, i) {
                         d3.select("#tooltip")
                             .select("#tooltip-title")
@@ -528,6 +632,7 @@ const drawCO2GeoMap = (dataset, geoJSON, minYear, maxYear) => {
             });
     };
 
+    // Adds event listener to the select options which redraws the map whenever the data is filtered
     let selectedYear = "";
     let selectedYearIndex = null;
     drawGeoMap(selectedYear, selectedYearIndex);
@@ -544,7 +649,21 @@ const drawCO2GeoMap = (dataset, geoJSON, minYear, maxYear) => {
 };
 
 
+/**
+ * Initializes all the charts that are shown in the page
+ */
 const initCharts = async () => {
+    /**
+     * Contains the chart.js configuration options for 
+     * all the scatter/line charts that are to be plotted.
+     * 
+     * chartElementName: id of the html element the chart is to be drawn into
+     * yearFilterElementName: id of the select element which is used to filter the chart data
+     * datasetFile: filename of the dataset to be used
+     * mainChartConfig: default chart configuration
+     * filterChartConfig: chart config to be used after the dataset has been filtered
+     * axisConfig: configuration of the chart axis
+     */
     const lineChartConfig = [{
             chartElementName: "gistemp-chart",
             yearFilterElementName: "gistemp-year",
@@ -863,6 +982,7 @@ const initCharts = async () => {
         }
     ];
 
+    // loops through all the chart configs and draws them
     for (const element of lineChartConfig) {
         const ctx = document.getElementById(element.chartElementName).getContext("2d");
         const chart = new Chart(ctx)
@@ -871,13 +991,24 @@ const initCharts = async () => {
 
         element.mainChartConfig.options = element.axisConfig.options;
         element.filterChartConfig.options = element.axisConfig.options;
+        
+        // adds the year select options
         addSelectOptions(element.yearFilterElementName, datasetYearValues);
+        // draws the chart
         drawLineChart(chart, dataset, element.mainChartConfig, true);
 
         let selectedYear = "";
+        /*
+            Adds an event listener to the select element used to filter the chart.
+            This is used to switch configurations from the default to the filtered version and 
+            vice versa
+        */
         document.getElementById(element.yearFilterElementName).addEventListener("change", function () {
             selectedYear = this.value;
             if (selectedYear !== "") {
+                /*
+                    Filters the data according to selected year.
+                */
                 const filteredDataset = dataset.filter(data => data.Time >= selectedYear && data.Time <= selectedYear + 1);
                 element.filterChartConfig.options.title.text = `${element.mainChartConfig.options.title.text} ${selectedYear}`;
 
@@ -888,17 +1019,23 @@ const initCharts = async () => {
         });
     }
 
+    //stacked bar chart
     const co2GasFuelDataset = await readFromCSV("data/API_EN.ATM.CO2E.GF.KT_DS2_en_csv_v2_1347792.csv");
     const co2GLiquidFuelDataset = await readFromCSV("data/API_EN.ATM.CO2E.LF.KT_DS2_en_csv_v2_1350621.csv");
     const co2SolidFuelDataset = await readFromCSV("data/API_EN.ATM.CO2E.SF.KT_DS2_en_csv_v2_1350043.csv");
 
     drawCO2StackedBarChart([co2GasFuelDataset, co2GLiquidFuelDataset, co2SolidFuelDataset], 1960, 2016);
 
+    // geo map
     const co2GlobalPerCapita = await readFromCSV("data/API_EN.ATM.CO2E.PC_DS2_en_csv_v2_1680019.csv");
     drawCO2GeoMap(co2GlobalPerCapita, "data/custom.geo.json", 1960, 2016);
 
 };
 
+/**
+ * Adds event listeners to the nav bar links. This is 
+ * done to toggle the active class whenever they are clicked
+ */
 const setupNavLinks = () => {
     const navLinks = document.querySelectorAll("nav ul li a");
 
@@ -915,7 +1052,11 @@ const setupNavLinks = () => {
     }
 };
 
-const main = async () => {
+
+/**
+ * Main function 
+ */
+const main = () => {
     setupNavLinks();
     initCharts();
 };
