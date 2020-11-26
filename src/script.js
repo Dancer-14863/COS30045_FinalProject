@@ -286,8 +286,9 @@ const drawCO2GeoMap = (dataset, geoJSON, minYear, maxYear) => {
 
         for (const element of dataset) {
 
-            if (!countryInfoSet.some(e => e.countryName === element["Country Name"])) {
+            if (!countryInfoSet.some(e => e.countryCode === element["Country Code"])) {
                 let countryInfo = {
+                    countryCode: element["Country Code"],
                     countryName: element["Country Name"],
                     emissions: new Array(maxYear - minYear + 1),
                     totalEmissions: 0
@@ -296,7 +297,7 @@ const drawCO2GeoMap = (dataset, geoJSON, minYear, maxYear) => {
                 countryInfoSet.push(countryInfo);
             }
 
-            const selectedCountry = countryInfoSet.filter(e => e.countryName === element["Country Name"]);
+            const selectedCountry = countryInfoSet.filter(e => e.countryCode === element["Country Code"]);
             if (element[i] !== "Not Recorded") {
                 selectedCountry[0].emissions[emissionIndex] = parseFloat(element[i], 10);
             }
@@ -442,7 +443,7 @@ const drawCO2GeoMap = (dataset, geoJSON, minYear, maxYear) => {
                     .call(legend);
 
                 for (const row of countryInfoSet) {
-                    const countryName = row.countryName;
+                    const countryCode = row.countryCode;
                     let emissionValue = 0;
 
                     if (selectedYear === "") {
@@ -452,7 +453,7 @@ const drawCO2GeoMap = (dataset, geoJSON, minYear, maxYear) => {
                     }
 
                     for (const element of json.features) {
-                        if (element.properties.name_sort === countryName) {
+                        if (element.properties.iso_a3 === countryCode) {
                             element.properties.value = parseFloat(emissionValue).toFixed(2);
                             break;
                         }

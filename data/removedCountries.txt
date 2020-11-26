@@ -1,237 +1,236 @@
 >Countries to check against
-Chad
-Fiji
-Cook Islands
-Ashmore and Cartier Islands
-American Samoa
-Kiribati
-Guam
-Micronesia, Federated States of
-Marshall Islands
-Australia
-Northern Mariana Islands
-Pitcairn Islands
-Nauru
-Norfolk Island
-Niue
-New Caledonia
-Palau
-New Zealand
-French Polynesia
-Albania
-Samoa
-Vanuatu
-Tonga
-Wallis and Futuna
-Papua New Guinea
-Solomon Islands
-Aland
-Andorra
-Austria
-Belgium
-Bulgaria
-Czech Republic
-Switzerland
-Belarus
-Bosnia and Herzegovina
-Germany
-Denmark
-Estonia
-Spain
-Finland
-France
-Faeroe Islands
-United Kingdom
-Guernsey
-Hungary
-Croatia
-Isle of Man
-Greece
-Iceland
-Kosovo
-Jersey
-Liechtenstein
-Ireland
-Italy
-Latvia
-Luxembourg
-Lithuania
-Monaco
-Malta
-Montenegro
-Moldova
-Netherlands
-Macedonia, FYR
-Poland
-Romania
-San Marino
-Portugal
-Slovak Republic
-Norway
-Serbia
-Slovenia
-Sweden
-Ukraine
-Vatican (Holy Sea)
-Russian Federation
-Argentina
-Ecuador
-Colombia
-Bolivia
-Falkland Islands
-Brazil
-Guyana
-Chile
-Peru
-Paraguay
-Suriname
-Venezuela, RB
-Uruguay
-Azerbaijan
-Bahrain
-Armenia
-United Arab Emirates
-Afghanistan
-Bangladesh
-Brunei
-Bhutan
-Cyprus, Northern
-Cyprus
-Hong Kong SAR, China
-Georgia
-China
-Indian Ocean Territories
-Iraq
-Iran, Islamic Rep.
-India
-Israel
-Jordan
-Japan
-Indonesia
-Kashmir
-Cambodia
-Kyrgyz Republic
-Kuwait
-Korea, Rep.
-Lebanon
-Lao PDR
-Kazakhstan
-Sri Lanka
-Macao SAR, China
-Mongolia
-Nepal
-Myanmar
-Oman
-Pakistan
-Korea, Dem. Rep.
-Malaysia
-Palestine (West Bank and Gaza)
-Qatar
-Saudi Arabia
-Philippines
-Singapore
-Tajikistan
-Syrian Arab Republic
-Turkmenistan
-Taiwan
-Timor-Leste
-Turkey
-Thailand
-Vietnam
-Yemen, Rep.
-Uzbekistan
-Angola
-Burundi
-Botswana
-Burkina Faso
-Central African Republic
-Benin
-Côte d'Ivoire
-Congo, Dem. Rep.
-Congo, Rep.
-Cameroon
-Comoros
-Djibouti
-Algeria
-Cape Verde
-Eritrea
-Egypt, Arab Rep.
-Ethiopia
-Ghana
-Gabon
-Gambia, The
-Guinea-Bissau
-Kenya
-Equatorial Guinea
-Libya
-Liberia
-Guinea
-Madagascar
-Lesotho
-Morocco
-Mauritania
-Malawi
-Nigeria
-Namibia
-Mali
-Niger
-Mozambique
-Rwanda
-Western Sahara
-Senegal
-Sudan
-South Sudan
-Somalia
-Somaliland
-Swaziland
-Sierra Leone
-Togo
-São Tomé and Principe
-Tunisia
-Tanzania
-South Africa
-Uganda
-Zimbabwe
-Anguilla
-Aruba
-Zambia
-Bahamas, The
-Antigua and Barbuda
-St-Barthélemy
-Belize
-Bermuda
-Cayman Islands
-Curaçao
-Dominica
-Barbados
-Cuba
-Costa Rica
-Dominican Republic
-Grenada
-Guatemala
-Honduras
-Haiti
-Jamaica
-St. Kitts and Nevis
-St. Martin (French part)
-Greenland
-St. Lucia
-Montserrat
-Mexico
-Panama
-Puerto Rico
-Canada
-Nicaragua
-St. Pierre and Miquelon
-El Salvador
-St. Maarten (Dutch part)
-Turks and Caicos Islands
-Trinidad and Tobago
-St. Vincent and the Grenadines
-Virgin Islands (U.S.)
-British Virgin Islands
-United States of America
-Antarctica
+TCD
+FJI
+COK
+ASM
+KIR
+GUM
+FSM
+MHL
+AUS
+MNP
+PCN
+NRU
+NFK
+NIU
+NCL
+PLW
+NZL
+PYF
+ALB
+WSM
+VUT
+TON
+WLF
+PNG
+SLB
+ALA
+AND
+AUT
+BEL
+BGR
+CZE
+CHE
+BLR
+BIH
+DEU
+DNK
+EST
+ESP
+FIN
+FRA
+FRO
+GBR
+GGY
+HUN
+HRV
+IMN
+GRC
+ISL
+-99
+JEY
+LIE
+IRL
+ITA
+LVA
+LUX
+LTU
+MCO
+MLT
+MNE
+MDA
+NLD
+MKD
+POL
+ROU
+SMR
+PRT
+SVK
+NOR
+SRB
+SVN
+SWE
+UKR
+VAT
+RUS
+ARG
+ECU
+COL
+BOL
+FLK
+BRA
+GUY
+CHL
+PER
+PRY
+SUR
+VEN
+URY
+AZE
+BHR
+ARM
+ARE
+AFG
+BGD
+BRN
+BTN
+-99
+CYP
+HKG
+GEO
+CHN
+-99
+IRQ
+IRN
+IND
+ISR
+JOR
+JPN
+IDN
+-99
+KHM
+KGZ
+KWT
+KOR
+LBN
+LAO
+KAZ
+LKA
+MAC
+MNG
+NPL
+MMR
+OMN
+PAK
+PRK
+MYS
+PSE
+QAT
+SAU
+PHL
+SGP
+TJK
+SYR
+TKM
+TWN
+TLS
+TUR
+THA
+VNM
+YEM
+UZB
+AGO
+BDI
+BWA
+BFA
+CAF
+BEN
+CIV
+COD
+COG
+CMR
+COM
+DJI
+DZA
+CPV
+ERI
+EGY
+ETH
+GHA
+GAB
+GMB
+GNB
+KEN
+GNQ
+LBY
+LBR
+GIN
+MDG
+LSO
+MAR
+MRT
+MWI
+NGA
+NAM
+MLI
+NER
+MOZ
+RWA
+ESH
+SEN
+SDN
+SSD
+SOM
+-99
+SWZ
+SLE
+TGO
+STP
+TUN
+TZA
+ZAF
+UGA
+ZWE
+AIA
+ABW
+ZMB
+BHS
+ATG
+BLM
+BLZ
+BMU
+CYM
+CUW
+DMA
+BRB
+CUB
+CRI
+DOM
+GRD
+GTM
+HND
+HTI
+JAM
+KNA
+MAF
+GRL
+LCA
+MSR
+MEX
+PAN
+PRI
+CAN
+NIC
+SPM
+SLV
+SXM
+TCA
+TTO
+VCT
+VIR
+VGB
+USA
+ATA
 
 >Formuala used
 =IFERROR(IF(MATCH(A2,Sheet1!$A$1:$A$231,0),"Yes"),"No")
