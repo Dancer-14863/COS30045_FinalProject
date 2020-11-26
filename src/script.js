@@ -145,17 +145,17 @@ const drawCO2StackedBarChart = (datasets, minYear, maxYear) => {
     let chartDatasets = [{
             label: "CO2 Emissions from Gaseous Fuel Consumption",
             data: new Array(maxYear - minYear + 1),
-            backgroundColor: 'red'
+            backgroundColor: '#008837'
         },
         {
             label: "CO2 Emissions from Liquid Fuel Consumption",
             data: new Array(maxYear - minYear + 1),
-            backgroundColor: 'green'
+            backgroundColor: '#f7f7f7'
         },
         {
             label: "CO2 Emissions from Solid Fuel Consumption",
             data: new Array(maxYear - minYear + 1),
-            backgroundColor: 'blue'
+            backgroundColor: '#7b3294'
         }
     ];
     chartDatasets[0].data.fill(0);
@@ -741,7 +741,7 @@ const initCharts = async () => {
                     responsive: true,
                     title: {
                         display: true,
-                        text: "NSIDC Artic Sea Ice Index"
+                        text: "NSIDC Arctic Sea Ice Index"
                     },
                     tooltips: {
                         mode: "index",
@@ -820,7 +820,7 @@ const initCharts = async () => {
                     responsive: true,
                     title: {
                         display: true,
-                        text: "NSIDC Antartic Sea Ice Index"
+                        text: "NSIDC Antarctic Sea Ice Index"
                     },
                     tooltips: {
                         mode: "index",
