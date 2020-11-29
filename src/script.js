@@ -180,7 +180,7 @@ const drawCO2StackedBarChart = (datasets, minYear, maxYear) => {
         {
             label: "CO2 Emissions from Liquid Fuel Consumption",
             data: new Array(maxYear - minYear + 1),
-            backgroundColor: '#f7f7f7'
+            backgroundColor: '#f0544f'
         },
         {
             label: "CO2 Emissions from Solid Fuel Consumption",
@@ -242,7 +242,8 @@ const drawCO2StackedBarChart = (datasets, minYear, maxYear) => {
             responsive: true,
             title: {
                 display: true,
-                text: "CO2 Emissions from Fuel Consumption"
+                text: "CO2 Emissions from Fuel Consumption",
+                fontColor: "#fff"
             },
             tooltips: {
                 mode: "index",
@@ -252,31 +253,42 @@ const drawCO2StackedBarChart = (datasets, minYear, maxYear) => {
                 mode: "nearest",
                 intersect: true
             },
+            legend: {
+                labels: {
+                    fontColor: "#fff"
+                }
+            },
             scales: {
                 xAxes: [{
                     display: true,
+                    ticks: {
+                        fontColor: "#fff"
+                    },
                     scaleLabel: {
                         display: true,
-                        labelString: "Year"
+                        labelString: "Year",
+                        fontColor: "#fff"
                     },
                     gridLines: {
                         drawOnChartArea: false,
-                        color: "#000"
+                        color: "#fff"
                     },
                     stacked: true,
                 }],
                 yAxes: [{
                     display: true,
+                    ticks: {
+                        fontColor: "#fff",
+                        beginAtZero: true
+                    },
                     scaleLabel: {
                         display: true,
-                        labelString: "metric kiloton (kt)"
+                        labelString: "metric kiloton (kt)",
+                        fontColor: "#fff"
                     },
                     gridLines: {
                         drawOnChartArea: false,
-                        color: "#000"
-                    },
-                    ticks: {
-                        beginAtZero: true
+                        color: "#fff"
                     },
                     stacked: true,
                 }]
@@ -369,7 +381,7 @@ const drawCO2GeoMap = (dataset, geoJSON, minYear, maxYear) => {
     for (const element of countryInfoSet) {
         element.totalEmissions = element.emissions.reduce((accumulator, currentValue) => accumulator + currentValue);
     }
-    
+
     // adds the year filter options
     addSelectOptions("co2-global-year", yearLabels);
 
@@ -678,10 +690,12 @@ const initCharts = async () => {
                         data: null,
                         label: "LOTI Monthly Mean",
                     }, {
+                        showLine: true,
                         fill: false,
                         borderColor: "#de1a1a",
                         data: null,
-                        label: "Linear Trend (OLS)"
+                        label: "Linear Trend (OLS)",
+                        pointRadius: 0
                     }]
                 },
             },
@@ -703,7 +717,8 @@ const initCharts = async () => {
                     responsive: true,
                     title: {
                         display: true,
-                        text: "GISS Land-Ocean Temperature Index"
+                        text: "GISS Land-Ocean Temperature Index",
+                        fontColor: "#fff"
                     },
                     tooltips: {
                         mode: "index",
@@ -713,30 +728,41 @@ const initCharts = async () => {
                         mode: "nearest",
                         intersect: true
                     },
+                    legend: {
+                        labels: {
+                            fontColor: "#fff"
+                        }
+                    },
                     scales: {
                         xAxes: [{
                             ticks: {
-                                maxTicksLimit: 10
+                                maxTicksLimit: 10,
+                                fontColor: "#fff"
                             },
                             display: true,
                             scaleLabel: {
                                 display: true,
-                                labelString: "Year"
+                                labelString: "Year",
+                                fontColor: "#fff"
                             },
                             gridLines: {
                                 drawOnChartArea: false,
-                                color: "#000"
+                                color: "#fff"
                             }
                         }],
                         yAxes: [{
                             display: true,
+                            ticks: {
+                                fontColor: "#fff"
+                            },
                             scaleLabel: {
                                 display: true,
-                                labelString: "Celsius (°C)"
+                                labelString: "Celsius (°C)",
+                                fontColor: "#fff"
                             },
                             gridLines: {
                                 drawOnChartArea: false,
-                                color: "#000"
+                                color: "#fff"
                             }
                         }]
                     }
@@ -760,7 +786,8 @@ const initCharts = async () => {
                         fill: false,
                         borderColor: "#de1a1a",
                         data: null,
-                        label: "Linear Trend (OLS)"
+                        label: "Linear Trend (OLS)",
+                        pointRadius: 0
                     }]
                 },
             },
@@ -782,7 +809,8 @@ const initCharts = async () => {
                     responsive: true,
                     title: {
                         display: true,
-                        text: "Atmospheric CO2 at Mauna Loa Observatory"
+                        text: "Atmospheric CO2 at Mauna Loa Observatory",
+                        fontColor: "#fff"
                     },
                     tooltips: {
                         mode: "index",
@@ -792,30 +820,41 @@ const initCharts = async () => {
                         mode: "nearest",
                         intersect: true
                     },
+                    legend: {
+                        labels: {
+                            fontColor: "#fff"
+                        }
+                    },
                     scales: {
                         xAxes: [{
                             ticks: {
-                                maxTicksLimit: 10
+                                maxTicksLimit: 10,
+                                fontColor: "#fff"
                             },
                             display: true,
                             scaleLabel: {
                                 display: true,
-                                labelString: "Year"
+                                labelString: "Year",
+                                fontColor: "#fff"
                             },
                             gridLines: {
                                 drawOnChartArea: false,
-                                color: "#000"
+                                color: "#fff"
                             }
                         }],
                         yAxes: [{
                             display: true,
+                            ticks: {
+                                fontColor: "#fff"
+                            },
                             scaleLabel: {
                                 display: true,
-                                labelString: "parts per million (ppm)"
+                                labelString: "parts per million (ppm)",
+                                fontColor: "#fff"
                             },
                             gridLines: {
                                 drawOnChartArea: false,
-                                color: "#000"
+                                color: "#fff"
                             }
                         }]
                     }
@@ -839,7 +878,8 @@ const initCharts = async () => {
                         fill: false,
                         borderColor: "#de1a1a",
                         data: null,
-                        label: "Linear Trend (OLS)"
+                        label: "Linear Trend (OLS)",
+                        pointRadius: 0
                     }]
                 },
             },
@@ -861,7 +901,8 @@ const initCharts = async () => {
                     responsive: true,
                     title: {
                         display: true,
-                        text: "NSIDC Arctic Sea Ice Index"
+                        text: "NSIDC Arctic Sea Ice Index",
+                        fontColor: "#fff"
                     },
                     tooltips: {
                         mode: "index",
@@ -871,30 +912,41 @@ const initCharts = async () => {
                         mode: "nearest",
                         intersect: true
                     },
+                    legend: {
+                        labels: {
+                            fontColor: "#fff"
+                        }
+                    },
                     scales: {
                         xAxes: [{
                             ticks: {
-                                maxTicksLimit: 10
+                                maxTicksLimit: 10,
+                                fontColor: "#fff"
                             },
                             display: true,
                             scaleLabel: {
                                 display: true,
-                                labelString: "Year"
+                                labelString: "Year",
+                                fontColor: "#fff"
                             },
                             gridLines: {
                                 drawOnChartArea: false,
-                                color: "#000"
+                                color: "#fff"
                             }
                         }],
                         yAxes: [{
                             display: true,
+                            ticks: {
+                                fontColor: "#fff"
+                            },
                             scaleLabel: {
                                 display: true,
-                                labelString: "%"
+                                labelString: "%",
+                                fontColor: "#fff"
                             },
                             gridLines: {
                                 drawOnChartArea: false,
-                                color: "#000"
+                                color: "#fff"
                             }
                         }]
                     }
@@ -918,7 +970,8 @@ const initCharts = async () => {
                         fill: false,
                         borderColor: "#de1a1a",
                         data: null,
-                        label: "Linear Trend (OLS)"
+                        label: "Linear Trend (OLS)",
+                        pointRadius: 0
                     }]
                 },
             },
@@ -940,7 +993,8 @@ const initCharts = async () => {
                     responsive: true,
                     title: {
                         display: true,
-                        text: "NSIDC Antarctic Sea Ice Index"
+                        text: "NSIDC Antarctic Sea Ice Index",
+                        fontColor: "#fff"
                     },
                     tooltips: {
                         mode: "index",
@@ -950,30 +1004,41 @@ const initCharts = async () => {
                         mode: "nearest",
                         intersect: true
                     },
+                    legend: {
+                        labels: {
+                            fontColor: "#fff"
+                        }
+                    },
                     scales: {
                         xAxes: [{
                             ticks: {
-                                maxTicksLimit: 10
+                                maxTicksLimit: 10,
+                                fontColor: "#fff"
                             },
                             display: true,
                             scaleLabel: {
                                 display: true,
-                                labelString: "Year"
+                                labelString: "Year",
+                                fontColor: "#fff"
                             },
                             gridLines: {
                                 drawOnChartArea: false,
-                                color: "#000"
+                                color: "#fff"
                             }
                         }],
                         yAxes: [{
                             display: true,
+                            ticks: {
+                                fontColor: "#fff"
+                            },
                             scaleLabel: {
                                 display: true,
-                                labelString: "%"
+                                labelString: "%",
+                                fontColor: "#fff"
                             },
                             gridLines: {
                                 drawOnChartArea: false,
-                                color: "#000"
+                                color: "#fff"
                             }
                         }]
                     }
@@ -991,7 +1056,7 @@ const initCharts = async () => {
 
         element.mainChartConfig.options = element.axisConfig.options;
         element.filterChartConfig.options = element.axisConfig.options;
-        
+
         // adds the year select options
         addSelectOptions(element.yearFilterElementName, datasetYearValues);
         // draws the chart
@@ -1040,7 +1105,7 @@ const setupNavLinks = () => {
     const navLinks = document.querySelectorAll("nav ul li a");
 
     for (const link of navLinks) {
-        link.addEventListener("click", function() {
+        link.addEventListener("click", function () {
             const currentActive = document.getElementsByClassName("active");
 
             if (currentActive.length != 0) {
